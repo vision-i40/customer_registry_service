@@ -7,16 +7,20 @@ lazy val IntegrationTestConf = config("integration").extend(Test)
 
 lazy val versions = new {
   val finatra = "19.3.0"
-  val finaglePostgres = "0.10.0"
+  val mongoDriver = "2.4.2"
   val logback = "1.2.3"
 }
 
 libraryDependencies ++= Seq(
   "com.twitter" %% "finatra-http" % versions.finatra,
   "ch.qos.logback" % "logback-classic" % versions.logback,
-  "io.github.finagle" %% "finagle-postgres" % versions.finaglePostgres,
+  "org.mongodb.scala" %% "mongo-scala-driver" % versions.mongoDriver,
   "com.typesafe" % "config" % "1.3.2",
-  "com.pauldijou" %% "jwt-core" % "2.1.0"
+  "com.pauldijou" %% "jwt-core" % "2.1.0",
+  "com.github.stevenchen3" %% "scala-faker" % "0.1.1" % Test,
+  "org.scalatest" %% "scalatest" % "3.0.5" % Test,
+  "org.mockito" % "mockito-all" % "1.9.5" % Test,
+
 )
 
 lazy val root = (project in file("."))

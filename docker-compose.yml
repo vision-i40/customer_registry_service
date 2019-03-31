@@ -1,13 +1,10 @@
 version: '3.5'
 
 services:
-
-  db:
-    image: postgres
+  mongodb:
+    image: mongo:4.0
     ports:
-      - 5432:5432
-
-  adminer:
-    image: adminer
-    ports:
-      - 8080:8080
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongodb
+      MONGO_INITDB_ROOT_PASSWORD: mongodb

@@ -7,6 +7,7 @@ case class User(
   email: String,
   username: String,
   password: String,
+  isActive: Boolean,
   createdAt: DateTime,
   updatedAt: DateTime
 )
