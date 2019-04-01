@@ -1,62 +1,41 @@
 package authentication
 
-import domain.{Company, User}
+import domain.User
+import infrastructure.config.EncryptionConfig
 import infrastructure.mongodb.MongoDB
+import org.mindrot.jbcrypt.BCrypt
 import org.mongodb.scala.MongoCollection
 import org.mongodb.scala.bson.BsonDocument
-
 import scala.concurrent.{ExecutionContext, Future}
 
 class UserRepository(implicit db: MongoDB, ec: ExecutionContext) {
-  import Company._
-  private val COLLECTION_NAME = "companies_configs"
+  import User._
+  private val COLLECTION_NAME = "users"
 
-  private lazy val collectionFuture: Future[MongoCollection[Company]] = db.collection[Company](COLLECTION_NAME)
+  private lazy val collectionFuture: Future[MongoCollection[User]] = db.collection[User](COLLECTION_NAME)
 
-  def getByEmailAndPassword(companyId: String, email: String, password: String): Future[Option[User]] = {
-    val userMatch = "$elemMatch" -> BsonDocument(
-      "email" -> email,
-      "password" -> encryptPassword(password)
-    )
-
+  def getByEmailAndPassword(email: String, password: String)
+                           (implicit config: EncryptionConfig): Future[Option[User]] = {
     collectionFuture
       .flatMap(collection => {
         collection
-          .find[Company](
+          .find[User](
           BsonDocument(
-            "id" -> companyId,
-            "users" -> BsonDocument(userMatch)
+            "email" -> email,
+            "password" -> encryptPassword(password)
           ))
-          .projection(BsonDocument("users" -> BsonDocument(userMatch)))
           .first()
-          .map(extractUser)
-          .toFuture()
+          .toFutureOption()
         }
-        .map(extractUserOption)
       )
   }
 
-  private def encryptPassword(password: String): String = {
-    // TODO: encrypt password
-    password
-  }
-
-  private def extractUserOption(users: Seq[Option[User]]): Option[User] = {
-    users match {
-      case Seq(maybeUser) => maybeUser
-      case _ => None
-    }
-  }
-
-  private def extractUser(company: Company): Option[User] = {
-    company.users match {
-      case Some(List(user: User)) => Some(user)
-      case _ => None
-    }
+  private def encryptPassword(password: String)
+                             (implicit config: EncryptionConfig): String = {
+    BCrypt.hashpw(password, config.salt)
   }
 }
 
 object UserRepository {
   def apply()(implicit db: MongoDB, ec: ExecutionContext): UserRepository = new UserRepository()
-
 }

@@ -17,6 +17,7 @@ libraryDependencies ++= Seq(
   "org.mongodb.scala" %% "mongo-scala-driver" % versions.mongoDriver,
   "com.typesafe" % "config" % "1.3.2",
   "com.pauldijou" %% "jwt-core" % "2.1.0",
+  "org.mindrot" % "jbcrypt" % "0.3m",
   "com.github.stevenchen3" %% "scala-faker" % "0.1.1" % Test,
   "org.scalatest" %% "scalatest" % "3.0.5" % Test,
   "org.mockito" % "mockito-all" % "1.9.5" % Test,

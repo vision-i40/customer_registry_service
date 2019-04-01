@@ -1,15 +1,28 @@
 package authentication
 
-import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
+import infrastructure.config.EncryptionConfig
+import infrastructure.mongodb.MongoDB
+import scala.concurrent.ExecutionContext
 
-class AuthenticationController extends Controller {
+class AuthenticationController(implicit repository: UserRepository,
+                               encryptionConfig: EncryptionConfig,
+                               ec: ExecutionContext) extends Controller {
 
-  post("/authenticate") { request: Request =>
-    "wip"
+  post("/authenticate") { request: AuthenticationRequest =>
+    GenerateToken(request.email, request.password)
+      .map { token => response.ok().body(AuthenticationToken(token)) }
+      .recover {
+        case _ => response.unauthorized().json("""{"message": "Unauthorized"}""")
+      }
   }
 }
 
 object AuthenticationController {
-  def apply(): AuthenticationController = new AuthenticationController()
+  def apply()(implicit db: MongoDB, ec: ExecutionContext): AuthenticationController ={
+    implicit val encryptionConfig: EncryptionConfig = EncryptionConfig
+    implicit val userRepository: UserRepository = UserRepository()
+
+    new AuthenticationController()
+  }
 }

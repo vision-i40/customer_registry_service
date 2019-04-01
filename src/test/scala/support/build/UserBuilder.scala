@@ -8,6 +8,7 @@ import org.joda.time.DateTime
 
 case class UserBuilder(
   id: String = UUID.randomUUID().toString,
+  companyId: String = UUID.randomUUID().toString,
   email: String = Internet().email,
   username: String = Person().firstNameFemale,
   password: String = Internet().password,
@@ -18,6 +19,7 @@ case class UserBuilder(
 
   def build: User = User(
     id = id,
+    companyId = companyId,
     email = email,
     username = username,
     password = password,

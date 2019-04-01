@@ -20,17 +20,16 @@ case class CompanyBuilder(
   updatedAt: DateTime = DateTime.now
 ) {
   def build:Company = Company(
-    id = Some(id),
-    name = Some(name),
-    users = Some(users),
-    turns = Some(turns),
-    productionLines = Some(productionLines),
-    collectors = Some(collectors),
-    stopGroups = Some(stopGroups),
-    reworkGroups = Some(reworkGroups),
-    wasteGroups = Some(wasteGroups),
-    unitOfMeasurements = Some(unitOfMeasurements),
-    createdAt = Some(createdAt),
-    updatedAt = Some(updatedAt)
+    id = id,
+    name = name,
+    turns = turns,
+    productionLines = productionLines,
+    collectors = collectors,
+    stopGroups = stopGroups,
+    reworkGroups = reworkGroups,
+    wasteGroups = wasteGroups,
+    unitOfMeasurements = unitOfMeasurements,
+    createdAt = createdAt,
+    updatedAt = updatedAt
   )
 }
