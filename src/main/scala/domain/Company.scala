@@ -6,15 +6,15 @@ import org.joda.time.DateTime
 case class Company(
   id: String,
   name: String,
-  productionLines: List[ProductionLine],
-  turns: List[Turn],
-  collectors: List[Collector],
-  stopGroups: List[StopGroup],
-  reworkGroups: List[ReworkGroup],
-  wasteGroups: List[WasteGroup],
-  unitOfMeasurements: List[UnitOfMeasurement],
-  createdAt: DateTime,
-  updatedAt: DateTime
+  productionLines: List[ProductionLine] = List(),
+  turns: List[Turn] = List(),
+  collectors: List[Collector] = List(),
+  stopGroups: List[StopGroup] = List(),
+  reworkGroups: List[ReworkGroup] = List(),
+  wasteGroups: List[WasteGroup] = List(),
+  unitOfMeasurements: List[UnitOfMeasurement] = List(),
+  createdAt: DateTime = DateTime.now,
+  updatedAt: DateTime = DateTime.now
 )
 
 object Company {

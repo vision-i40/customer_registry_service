@@ -1,7 +1,7 @@
-package integration.authentication
+package integration.domain.repositories
 
-import authentication.UserRepository
 import domain.User
+import domain.repositories.UserRepository
 import infrastructure.config.{EncryptionConfig, MongoDBConfig}
 import infrastructure.mongodb.MongoDB
 import org.mindrot.jbcrypt.BCrypt
@@ -18,9 +18,11 @@ class UserRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEach with Be
   implicit private val encryptionConfig: EncryptionConfig.type = EncryptionConfig
   private val repository: UserRepository = UserRepository()
 
+  import domain.User._
+
   override def beforeEach(): Unit = {
     super.beforeEach()
-    MongoDBHelper.clearCompanyCollection()
+    MongoDBHelper.clearCollection()
   }
 
   behavior of "retrieving user by user and password"

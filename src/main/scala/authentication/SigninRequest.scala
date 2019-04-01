@@ -1,6 +1,6 @@
 package authentication
 
-case class AuthenticationRequest(
+case class SigninRequest(
   email: String,
   password: String
 )

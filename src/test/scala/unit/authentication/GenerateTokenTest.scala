@@ -1,7 +1,8 @@
 package unit.authentication
 
-import authentication.{GenerateToken, UserRepository}
+import authentication.GenerateToken
 import domain.User
+import domain.repositories.UserRepository
 import infrastructure.config.EncryptionConfig
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar

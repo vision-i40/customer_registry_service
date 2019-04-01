@@ -1,11 +1,15 @@
-package authentication
+package domain.repositories
 
-import domain.User
+import java.util.UUID
+import java.util.UUID.randomUUID
+
+import domain.{Company, User}
 import infrastructure.config.EncryptionConfig
 import infrastructure.mongodb.MongoDB
 import org.mindrot.jbcrypt.BCrypt
 import org.mongodb.scala.MongoCollection
 import org.mongodb.scala.bson.BsonDocument
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class UserRepository(implicit db: MongoDB, ec: ExecutionContext) {
@@ -28,6 +32,26 @@ class UserRepository(implicit db: MongoDB, ec: ExecutionContext) {
           .toFutureOption()
         }
       )
+  }
+
+  def create(email: String, username: String, password: String)
+            (implicit company: Company): Future[User] = {
+    val user = User(
+      id = randomUUID().toString,
+      companyId = company.id,
+      email = email,
+      username = username,
+      password = password,
+      isActive = true
+    )
+
+    collectionFuture
+      .flatMap { collection =>
+        collection
+          .insertOne(user)
+          .toFuture()
+          .map(_ => user)
+      }
   }
 
   private def encryptPassword(password: String)

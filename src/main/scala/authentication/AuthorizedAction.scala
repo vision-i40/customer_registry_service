@@ -1,0 +1,5 @@
+package authentication
+
+object AuthorizedAction {
+
+}

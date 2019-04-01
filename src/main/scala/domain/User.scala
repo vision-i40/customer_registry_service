@@ -10,8 +10,8 @@ case class User(
   username: String,
   password: String,
   isActive: Boolean,
-  createdAt: DateTime,
-  updatedAt: DateTime
+  createdAt: DateTime = DateTime.now,
+  updatedAt: DateTime = DateTime.now
 )
 
 object User {
