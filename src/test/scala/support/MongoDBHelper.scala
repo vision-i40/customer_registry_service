@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
 import scala.reflect.ClassTag
 
-object MongoDbHelper {
+object MongoDBHelper {
   implicit private val config: MongoDBConfig = MongoDBConfig
   private lazy val mongoClient: MongoClient = MongoClient(config.connectionString)
   private lazy val database: MongoDatabase = mongoClient.getDatabase(config.database)

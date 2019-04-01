@@ -1,6 +1,7 @@
 package authentication
 
 import com.twitter.finatra.http.Controller
+import com.twitter.finatra.http.response.ResponseBuilder
 import infrastructure.config.EncryptionConfig
 import infrastructure.mongodb.MongoDB
 import scala.concurrent.ExecutionContext
@@ -11,10 +12,13 @@ class AuthenticationController(implicit repository: UserRepository,
 
   post("/authenticate") { request: AuthenticationRequest =>
     GenerateToken(request.email, request.password)
-      .map { token => response.ok().body(AuthenticationToken(token)) }
       .recover {
-        case _ => response.unauthorized().json("""{"message": "Unauthorized"}""")
+        case _ => handleUnauthorized
       }
+  }
+
+  private def handleUnauthorized: ResponseBuilder#EnrichedResponse = {
+    response.unauthorized().json("""{"message": "Unauthorized. Please, double check your credentials."}""")
   }
 }
 

@@ -7,7 +7,7 @@ import infrastructure.mongodb.MongoDB
 import org.mindrot.jbcrypt.BCrypt
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import support.build.UserBuilder
-import support.{MongoDbHelper, VisionAsyncSpec}
+import support.{MongoDBHelper, VisionAsyncSpec}
 
 import scala.concurrent.Future
 
@@ -20,7 +20,7 @@ class UserRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEach with Be
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    MongoDbHelper.clearCompanyCollection()
+    MongoDBHelper.clearCompanyCollection()
   }
 
   behavior of "retrieving user by user and password"
@@ -31,9 +31,9 @@ class UserRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEach with Be
     val expectedUser = UserBuilder(email = email, password = BCrypt.hashpw(password, encryptionConfig.salt)).build
     val secondNoiseUser = UserBuilder().build
 
-    MongoDbHelper.insert(firstNoiseUser)
-    MongoDbHelper.insert(expectedUser)
-    MongoDbHelper.insert(secondNoiseUser)
+    MongoDBHelper.insert(firstNoiseUser)
+    MongoDBHelper.insert(expectedUser)
+    MongoDBHelper.insert(secondNoiseUser)
 
     val userFuture: Future[Option[User]] = repository.getByEmailAndPassword(email, password)
 
@@ -48,8 +48,8 @@ class UserRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEach with Be
     val firstNoiseUser = UserBuilder().build
     val secondNoiseUser = UserBuilder().build
 
-    MongoDbHelper.insert(firstNoiseUser)
-    MongoDbHelper.insert(secondNoiseUser)
+    MongoDBHelper.insert(firstNoiseUser)
+    MongoDBHelper.insert(secondNoiseUser)
 
     val userFuture: Future[Option[User]] = repository.getByEmailAndPassword(email, password)
 

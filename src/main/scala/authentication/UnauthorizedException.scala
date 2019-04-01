@@ -1,7 +1,7 @@
 package authentication
 
-class UnauthorizedException extends RuntimeException
+class UnauthorizedException(message: String) extends RuntimeException(message)
 
 object UnauthorizedException {
-  def apply(): UnauthorizedException = new UnauthorizedException()
+  def apply(message: String): UnauthorizedException = new UnauthorizedException(message)
 }

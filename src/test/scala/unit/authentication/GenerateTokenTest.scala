@@ -25,8 +25,8 @@ class GenerateTokenTest extends VisionAsyncSpec with MockitoSugar {
 
     val tokenFuture = GenerateToken(email, password)
 
-    tokenFuture.map { token =>
-      val decodedToken = Jwt.decode(token, config.secretKey, Seq(JwtAlgorithm.HS256))
+    tokenFuture.map { authorizationToken =>
+      val decodedToken = Jwt.decode(authorizationToken.token, config.secretKey, Seq(JwtAlgorithm.HS256))
       decodedToken.isSuccess shouldEqual true
       decodedToken.get shouldEqual s"""{"id":"${user.id}"}"""
     }
