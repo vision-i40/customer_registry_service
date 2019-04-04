@@ -1,6 +1,5 @@
 package domain.repositories
 
-import java.util.UUID
 import java.util.UUID.randomUUID
 
 import domain.{Company, User}
@@ -35,13 +34,13 @@ class UserRepository(implicit db: MongoDB, ec: ExecutionContext) {
   }
 
   def create(email: String, username: String, password: String)
-            (implicit company: Company): Future[User] = {
+            (implicit company: Company, config: EncryptionConfig): Future[User] = {
     val user = User(
       id = randomUUID().toString,
       companyId = company.id,
       email = email,
       username = username,
-      password = password,
+      password = encryptPassword(password),
       isActive = true
     )
 

@@ -13,7 +13,7 @@ object SetupCompany {
             encryptionConfig: EncryptionConfig): Future[AuthenticationToken] = {
     val userFuture: Future[User] = for {
       company <- companyRepository.create(request.companyName)
-      user <- userRepository.create(request.userEmail, request.userName, request.userPassword)(company)
+      user <- userRepository.create(request.userEmail, request.userName, request.userPassword)(company, encryptionConfig)
     } yield user
 
     userFuture.map(BuildToken(_))
