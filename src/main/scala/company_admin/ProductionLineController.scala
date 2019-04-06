@@ -12,13 +12,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
 @Singleton
 class ProductionLineController @Inject()(authenticatedUser: AuthenticatedUser,
                                          repository: ProductionLineRepository) extends Controller {
-  get("/v1/:company_slug/production_lines") { _: Request =>
+  private val API_VERSION = "v1"
+  private val COMPANY_SLUG = "company_slug"
+  private val BASE_RESOURCE: String = "/" + API_VERSION + "/:" + COMPANY_SLUG
+
+  get(BASE_RESOURCE + "/production_lines") { _: Request =>
     authenticatedUser
       .getCompany
       .productionLines
   }
 
-  post("/v1/:company_slug/production_lines") { request: ProductionLineRequest =>
+  post(BASE_RESOURCE + "/production_lines") { request: ProductionLineRequest =>
     implicit val company: Company = authenticatedUser.getCompany
 
     repository
@@ -31,7 +35,7 @@ class ProductionLineController @Inject()(authenticatedUser: AuthenticatedUser,
       ).map(productionLine => response.created.body(productionLine))
   }
 
-  get("/v1/:company_slug/production_line/:id") { request: ShowProductionLineRequest =>
+  get(BASE_RESOURCE + "/production_line/:id") { request: ShowProductionLineRequest =>
     authenticatedUser
       .getCompany
       .productionLines
