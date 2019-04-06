@@ -1,6 +1,9 @@
 package infrastructure.config
 
-trait MongoDBConfig extends Configuration {
+import com.google.inject.Singleton
+
+@Singleton
+class MongoDBConfig extends Configuration {
   private val ROOT = "mongodb"
   private val HOST = s"$ROOT.host"
   private val PORT = s"$ROOT.port"
@@ -16,5 +19,3 @@ trait MongoDBConfig extends Configuration {
   def password: String = config.getString(PASSWORD)
   def connectionString: String = config.getString(CONNECTION_STRING)
 }
-
-object MongoDBConfig extends MongoDBConfig

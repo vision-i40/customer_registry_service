@@ -1,4 +1,4 @@
-package authentication
+package authentication.exceptions
 
 class UnauthorizedException(message: String) extends RuntimeException(message)
 

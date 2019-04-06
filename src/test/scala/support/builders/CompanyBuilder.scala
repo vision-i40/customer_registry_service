@@ -1,4 +1,4 @@
-package support.build
+package support.builders
 
 import java.util.UUID
 import io.alphash.faker._
@@ -8,6 +8,7 @@ import org.joda.time.DateTime
 case class CompanyBuilder(
   id: String = UUID.randomUUID().toString,
   name: String = Person().lastName,
+  slug: String = Person().lastName.toLowerCase.replaceAll(" ", "-"),
   users: List[User] = List(UserBuilder().build),
   turns: List[Turn] = List(),
   productionLines: List[ProductionLine] = List(),
@@ -22,6 +23,7 @@ case class CompanyBuilder(
   def build:Company = Company(
     id = id,
     name = name,
+    slug = slug,
     turns = turns,
     productionLines = productionLines,
     collectors = collectors,

@@ -6,5 +6,5 @@ case class ProductionLine(
   oee_goal: Double,
   reset_production: Boolean,
   discount_rework: Boolean,
-  discount_waste: Boolean,
+  discount_waste: Boolean
 )

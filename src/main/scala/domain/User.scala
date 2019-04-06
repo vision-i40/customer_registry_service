@@ -5,13 +5,13 @@ import org.joda.time.DateTime
 
 case class User(
   id: String,
-  companyId: String,
+  companyIds: List[String],
   email: String,
   username: String,
   password: String,
   isActive: Boolean,
-  createdAt: DateTime = DateTime.now,
-  updatedAt: DateTime = DateTime.now
+  createdAt: DateTime,
+  updatedAt: DateTime
 )
 
 object User {

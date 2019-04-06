@@ -9,8 +9,8 @@ import org.scalatest.time.{Seconds, Span}
 import support.VisionSpec
 
 class MongoDBTest extends VisionSpec with Eventually {
-  implicit private val config: MongoDBConfig = MongoDBConfig
-  private val db = MongoDB()
+  private val config: MongoDBConfig = new  MongoDBConfig
+  private val db = new MongoDB(config)
   implicit private val codec: CodecRegistry = DEFAULT_CODEC_REGISTRY
 
   behavior of "Mongo DB Connection"

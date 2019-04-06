@@ -4,7 +4,7 @@ import infrastructure.config.MongoDBConfig
 import support.VisionSpec
 
 class MongoDBConfigTest extends VisionSpec {
-  private val config: MongoDBConfig.type = MongoDBConfig
+  private val config = new MongoDBConfig()
 
   behavior of "MongoDBConfig"
   it should "return connectionString" in {

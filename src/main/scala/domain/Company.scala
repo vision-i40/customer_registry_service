@@ -6,6 +6,7 @@ import org.joda.time.DateTime
 case class Company(
   id: String,
   name: String,
+  slug: String,
   productionLines: List[ProductionLine] = List(),
   turns: List[Turn] = List(),
   collectors: List[Collector] = List(),

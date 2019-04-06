@@ -6,13 +6,14 @@ import infrastructure.config.MongoDBConfig
 import infrastructure.mongodb.MongoDB
 import org.mongodb.scala.bson.BsonDocument
 import org.scalatest.BeforeAndAfterEach
+import support.builders.CompanyBuilder
 import support.{MongoDBHelper, VisionAsyncSpec}
 
 class CompanyRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEach {
   implicit private val collectionName: String = "companies"
-  implicit private val mongoConfig: MongoDBConfig = MongoDBConfig
-  implicit private val db: MongoDB = MongoDB()
-  private val companies: CompanyRepository = CompanyRepository()
+  private val mongoConfig: MongoDBConfig = new MongoDBConfig()
+  private val db: MongoDB = new MongoDB(mongoConfig)
+  private val companies: CompanyRepository = new CompanyRepository(db)
 
   import domain.Company._
 
@@ -24,15 +25,32 @@ class CompanyRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEach {
   behavior of "adding new company"
   it should "create new company" in {
     val companyName = "The Awesome Company CO."
-
-    val companyFuture = companies.create(companyName)
+    val companySlug = "theawseomecompanyco"
+    val companyFuture = companies.create(companyName, companySlug)
 
     companyFuture.flatMap { actualCompany =>
       actualCompany.name shouldEqual companyName
       MongoDBHelper.find[Company](BsonDocument("id" -> actualCompany.id)).map { storedCompanies =>
         storedCompanies.head.name shouldEqual companyName
+        storedCompanies.head.slug shouldEqual companySlug
         storedCompanies should have size 1
       }
+    }
+  }
+
+  behavior of "finding a company by slug"
+  it should "return a company when slug matches" in {
+    val companyName = "The Awesome Company CO."
+    val companySlug = "theawseomecompanyco"
+
+    val expectedCompany = CompanyBuilder(name = companyName, slug = companySlug).build
+    MongoDBHelper.insert[Company](expectedCompany)
+
+    val companyFuture = companies.findBySlug(companySlug)
+
+    companyFuture.map { actualCompany =>
+      actualCompany.isDefined shouldEqual true
+      actualCompany shouldEqual Some(expectedCompany)
     }
   }
 }

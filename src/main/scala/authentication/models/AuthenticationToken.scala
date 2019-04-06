@@ -1,3 +1,3 @@
-package authentication
+package authentication.models
 
 case class AuthenticationToken(token: String)

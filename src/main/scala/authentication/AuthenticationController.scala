@@ -1,27 +1,24 @@
 package authentication
 
+import authentication.models.{SigninRequest, SignupRequest}
+import com.google.inject.{Inject, Singleton}
 import com.twitter.finatra.http.Controller
 import com.twitter.finatra.http.response.ResponseBuilder
-import domain.repositories.{CompanyRepository, UserRepository}
-import infrastructure.config.EncryptionConfig
-import infrastructure.mongodb.MongoDB
+import scala.concurrent.ExecutionContext.Implicits.global
 
-import scala.concurrent.ExecutionContext
-
-class AuthenticationController(implicit repository: UserRepository,
-                               companyRepository: CompanyRepository,
-                               encryptionConfig: EncryptionConfig,
-                               ec: ExecutionContext) extends Controller {
+@Singleton
+class AuthenticationController @Inject()(signInService: SignInService,
+                                         signUpService: SignUpService) extends Controller {
 
   post("/auth/sign_in") { request: SigninRequest =>
-    GenerateToken(request.email, request.password)
+    signInService.generateToken(request.email, request.password)
       .recover {
         case _ => handleUnauthorized
       }
   }
 
   post("/auth/sign_up") { request: SignupRequest =>
-    SetupCompany(request)
+    signUpService.setupCompany(request)
       .recover {
         case e => handleError(e)
       }
@@ -33,15 +30,5 @@ class AuthenticationController(implicit repository: UserRepository,
 
   private def handleError(e: Throwable): ResponseBuilder#EnrichedResponse = {
     response.badRequest.json(s"""{"message": "Something went wrong processing the request. ${e.getMessage}."}""")
-  }
-}
-
-object AuthenticationController {
-  def apply()(implicit db: MongoDB, ec: ExecutionContext): AuthenticationController ={
-    implicit val encryptionConfig: EncryptionConfig = EncryptionConfig
-    implicit val userRepository: UserRepository = UserRepository()
-    implicit val companyRepository: CompanyRepository = CompanyRepository()
-
-    new AuthenticationController()
   }
 }

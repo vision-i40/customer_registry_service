@@ -5,13 +5,12 @@ import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.result.DeleteResult
 import org.mongodb.scala.{Completed, MongoClient, MongoCollection, MongoDatabase}
-
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.reflect.ClassTag
 
 object MongoDBHelper {
-  implicit private val config: MongoDBConfig = MongoDBConfig
+  implicit private val config: MongoDBConfig = new MongoDBConfig()
   private lazy val mongoClient: MongoClient = MongoClient(config.connectionString)
   private lazy val database: MongoDatabase = mongoClient.getDatabase(config.database)
 

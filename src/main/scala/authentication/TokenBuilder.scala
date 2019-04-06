@@ -1,11 +1,14 @@
 package authentication
 
+import authentication.models.AuthenticationToken
+import com.google.inject.{Inject, Singleton}
 import domain.User
 import infrastructure.config.EncryptionConfig
 import pdi.jwt.{Jwt, JwtAlgorithm}
 
-object BuildToken {
-  def apply(user: User)(implicit encryptionConfig: EncryptionConfig): AuthenticationToken = {
+@Singleton
+class TokenBuilder @Inject()(encryptionConfig: EncryptionConfig) {
+  def build(user: User): AuthenticationToken = {
     AuthenticationToken(Jwt.encode(generateUserData(user), encryptionConfig.secretKey, JwtAlgorithm.HS256))
   }
 

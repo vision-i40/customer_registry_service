@@ -6,17 +6,17 @@ import infrastructure.config.{EncryptionConfig, MongoDBConfig}
 import infrastructure.mongodb.MongoDB
 import org.mindrot.jbcrypt.BCrypt
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
-import support.build.UserBuilder
+import support.builders.UserBuilder
 import support.{MongoDBHelper, VisionAsyncSpec}
 
 import scala.concurrent.Future
 
 class UserRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEach with BeforeAndAfterAll {
   implicit private val collectionName: String = "users"
-  implicit private val mongoConfig: MongoDBConfig = MongoDBConfig
-  implicit private val db: MongoDB = MongoDB()
-  implicit private val encryptionConfig: EncryptionConfig.type = EncryptionConfig
-  private val repository: UserRepository = UserRepository()
+  private val mongoConfig: MongoDBConfig = new MongoDBConfig()
+  private val db: MongoDB = new MongoDB(mongoConfig)
+  private val encryptionConfig: EncryptionConfig = new EncryptionConfig()
+  private val repository: UserRepository = new UserRepository(db, encryptionConfig)
 
   import domain.User._
 

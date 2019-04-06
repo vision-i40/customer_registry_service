@@ -1,6 +1,7 @@
-package support.build
+package support.builders
 
 import java.util.UUID
+import java.util.UUID.randomUUID
 
 import io.alphash.faker._
 import domain.User
@@ -9,18 +10,18 @@ import org.joda.time.DateTime
 import org.mindrot.jbcrypt.BCrypt
 
 case class UserBuilder(
-  id: String = UUID.randomUUID().toString,
-  companyId: String = UUID.randomUUID().toString,
+  id: String = randomUUID().toString,
+  companyIds: List[String] = List(randomUUID().toString),
   email: String = Internet().email,
   username: String = Person().firstNameFemale,
-  password: String = BCrypt.hashpw("password", EncryptionConfig.salt),
+  password: String = BCrypt.hashpw("password", (new EncryptionConfig).salt),
   isActive: Boolean = true,
   createdAt: DateTime = DateTime.now,
   updatedAt: DateTime = DateTime.now
 ) {
   def build: User = User(
     id = id,
-    companyId = companyId,
+    companyIds = companyIds,
     email = email,
     username = username,
     password = password,

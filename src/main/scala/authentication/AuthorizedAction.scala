@@ -1,5 +1,0 @@
-package authentication
-
-object AuthorizedAction {
-
-}

@@ -1,13 +1,15 @@
 package infrastructure.mongodb
 
+import com.google.inject.{Inject, Singleton}
 import infrastructure.config.MongoDBConfig
 import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala.{MongoClient, MongoCollection, MongoDatabase}
-
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.reflect.ClassTag
 
-class MongoDB(implicit config: MongoDBConfig, ec: ExecutionContext) {
+@Singleton
+class MongoDB @Inject()(config: MongoDBConfig) {
   private lazy val mongoClient: MongoClient = MongoClient(config.connectionString)
   private lazy val database: MongoDatabase = mongoClient.getDatabase(config.database)
 
@@ -16,8 +18,4 @@ class MongoDB(implicit config: MongoDBConfig, ec: ExecutionContext) {
       .withCodecRegistry(codec)
       .getCollection[W](name)
   }
-}
-
-object MongoDB {
-  def apply()(implicit config: MongoDBConfig, ec: ExecutionContext): MongoDB = new MongoDB()
 }
