@@ -1,4 +1,4 @@
-package domain
+package domain.models
 
 case class Channel(
   id: String,

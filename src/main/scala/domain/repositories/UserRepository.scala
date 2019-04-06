@@ -3,13 +3,14 @@ package domain.repositories
 import java.util.UUID.randomUUID
 
 import com.google.inject.{Inject, Singleton}
-import domain.{Company, User}
+import domain.models.{Company, User}
 import infrastructure.config.EncryptionConfig
 import infrastructure.mongodb.MongoDB
 import org.joda.time.DateTime
 import org.mindrot.jbcrypt.BCrypt
 import org.mongodb.scala.MongoCollection
 import org.mongodb.scala.bson.BsonDocument
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

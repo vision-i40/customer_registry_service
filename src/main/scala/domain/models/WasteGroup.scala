@@ -1,11 +1,11 @@
-package domain
+package domain.models
 
 import org.joda.time.DateTime
 
-case class UnitOfMeasurement(
+case class WasteGroup (
   id: String,
   name: String,
-  conversionFactor: Double,
+  wasteCodes: List[WasteCode],
   createdAt: DateTime,
   updatedAt: DateTime,
   description: Option[String] = None

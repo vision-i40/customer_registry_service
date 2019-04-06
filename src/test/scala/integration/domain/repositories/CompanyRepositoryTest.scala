@@ -1,7 +1,7 @@
 package integration.domain.repositories
 
-import domain.Company
-import domain.repositories.CompanyRepository
+import domain.models.Company
+import domain.repositories.{CompanyCollection, CompanyRepository}
 import infrastructure.config.MongoDBConfig
 import infrastructure.mongodb.MongoDB
 import org.mongodb.scala.bson.BsonDocument
@@ -13,9 +13,10 @@ class CompanyRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEach {
   implicit private val collectionName: String = "companies"
   private val mongoConfig: MongoDBConfig = new MongoDBConfig()
   private val db: MongoDB = new MongoDB(mongoConfig)
-  private val companies: CompanyRepository = new CompanyRepository(db)
+  private val companyCollection = new CompanyCollection(db)
+  private val companies: CompanyRepository = new CompanyRepository(companyCollection)
 
-  import domain.Company._
+  import domain.models.Company._
 
   override def beforeEach(): Unit = {
     super.beforeEach()

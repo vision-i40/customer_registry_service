@@ -2,7 +2,7 @@ package authentication
 
 import authentication.models.AuthenticationToken
 import com.google.inject.{Inject, Singleton}
-import domain.User
+import domain.models.User
 import infrastructure.config.EncryptionConfig
 import pdi.jwt.{Jwt, JwtAlgorithm}
 

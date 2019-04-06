@@ -1,5 +1,6 @@
-package domain
+package domain.models
 
+import domain._
 import infrastructure.mongodb.codecs.JodaCodec
 import org.joda.time.DateTime
 

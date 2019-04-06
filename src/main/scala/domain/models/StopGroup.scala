@@ -1,11 +1,11 @@
-package domain
+package domain.models
 
 import org.joda.time.DateTime
 
-case class WasteCode(
+case class StopGroup(
   id: String,
   name: String,
-  reasonClass: String,
+  stopCodes: List[StopCode],
   createdAt: DateTime,
   updatedAt: DateTime,
   description: Option[String] = None

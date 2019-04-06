@@ -2,7 +2,7 @@ package authentication.models
 
 import authentication.exceptions.UnauthorizedException
 import com.google.inject.Singleton
-import domain.{Company, User}
+import domain.models.{Company, User}
 
 @Singleton
 class AuthenticatedUser {

@@ -1,6 +1,6 @@
 package integration.domain.repositories
 
-import domain.User
+import domain.models.User
 import domain.repositories.UserRepository
 import infrastructure.config.{EncryptionConfig, MongoDBConfig}
 import infrastructure.mongodb.MongoDB
@@ -18,7 +18,7 @@ class UserRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEach with Be
   private val encryptionConfig: EncryptionConfig = new EncryptionConfig()
   private val repository: UserRepository = new UserRepository(db, encryptionConfig)
 
-  import domain.User._
+  import domain.models.User._
 
   override def beforeEach(): Unit = {
     super.beforeEach()

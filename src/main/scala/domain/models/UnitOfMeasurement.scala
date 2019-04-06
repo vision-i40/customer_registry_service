@@ -1,12 +1,11 @@
-package domain
+package domain.models
 
 import org.joda.time.DateTime
 
-case class Turn(
+case class UnitOfMeasurement(
   id: String,
   name: String,
-  startTime: DateTime,
-  endTime: DateTime,
+  conversionFactor: Double,
   createdAt: DateTime,
   updatedAt: DateTime,
   description: Option[String] = None

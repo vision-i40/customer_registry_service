@@ -2,9 +2,10 @@ package authentication
 
 import authentication.models.{AuthenticationToken, SignupRequest}
 import com.google.inject.{Inject, Singleton}
-import domain.User
+import domain.models.User
 import domain.repositories.{CompanyRepository, UserRepository}
 import infrastructure.config.EncryptionConfig
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

@@ -3,8 +3,8 @@ package support.builders
 import java.util.UUID
 import java.util.UUID.randomUUID
 
+import domain.models.User
 import io.alphash.faker._
-import domain.User
 import infrastructure.config.EncryptionConfig
 import org.joda.time.DateTime
 import org.mindrot.jbcrypt.BCrypt

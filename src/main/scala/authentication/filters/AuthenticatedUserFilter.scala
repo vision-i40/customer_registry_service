@@ -8,7 +8,7 @@ import com.twitter.finagle.{Service, SimpleFilter}
 import com.twitter.inject.Logging
 import com.twitter.inject.requestscope.FinagleRequestScope
 import com.twitter.util.{Future => TwitterFuture}
-import domain.{Company, User}
+import domain.models.{Company, User}
 import domain.repositories.{CompanyRepository, UserRepository}
 import infrastructure.FutureConversions._
 import infrastructure.config.EncryptionConfig

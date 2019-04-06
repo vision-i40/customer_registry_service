@@ -2,7 +2,7 @@ package unit.authentication
 
 import authentication.models.AuthenticationToken
 import authentication.{SignInService, TokenBuilder}
-import domain.User
+import domain.models.User
 import domain.repositories.UserRepository
 import infrastructure.config.EncryptionConfig
 import org.mockito.Mockito._
