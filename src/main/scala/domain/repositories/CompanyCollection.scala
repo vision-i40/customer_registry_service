@@ -9,10 +9,10 @@ import scala.concurrent.Future
 
 @Singleton
 class CompanyCollection @Inject()(db: MongoDB) {
-  private val COLLECTION_NAME = "companies"
   import domain.models.Company._
 
-  def collectionFuture(): Future[MongoCollection[Company]] =
+  private val COLLECTION_NAME = "companies"
+  lazy val collectionFuture: Future[MongoCollection[Company]] =
     db
       .collection[Company](COLLECTION_NAME)
       .map(_.withCodecRegistry(companyCodecRegistry))

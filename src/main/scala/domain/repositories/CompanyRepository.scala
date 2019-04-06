@@ -15,7 +15,7 @@ class CompanyRepository @Inject()(companyCollection: CompanyCollection) {
     val company = buildCompany(name, slug)
 
     companyCollection
-      .collectionFuture()
+      .collectionFuture
       .flatMap { collection =>
         collection
           .insertOne(company)
@@ -26,7 +26,7 @@ class CompanyRepository @Inject()(companyCollection: CompanyCollection) {
 
   def findBySlug(slug: String): Future[Option[Company]] = {
     companyCollection
-      .collectionFuture()
+      .collectionFuture
       .flatMap { collection =>
         collection
           .find(BsonDocument("slug" -> slug))

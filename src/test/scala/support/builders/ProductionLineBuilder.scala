@@ -12,7 +12,7 @@ case class ProductionLineBuilder(
   oeeGoal: Double = 0.8,
   resetProduction: Boolean = false,
   discountRework: Boolean = false,
-  discountWaste: Boolean = true,
+  discountWaste: Boolean = false,
   createdAt: DateTime = DateTime.now,
   updatedAt: DateTime = DateTime.now
 ) {

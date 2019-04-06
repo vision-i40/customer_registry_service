@@ -11,14 +11,16 @@ class AuthenticationController @Inject()(signInService: SignInService,
                                          signUpService: SignUpService) extends Controller {
 
   post("/auth/sign_in") { request: SigninRequest =>
-    signInService.generateToken(request.email, request.password)
+    signInService
+      .generateToken(request.email, request.password)
       .recover {
         case _ => handleUnauthorized
       }
   }
 
   post("/auth/sign_up") { request: SignupRequest =>
-    signUpService.setupCompany(request)
+    signUpService
+      .setupCompany(request)
       .recover {
         case e => handleError(e)
       }

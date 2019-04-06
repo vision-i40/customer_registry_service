@@ -6,7 +6,6 @@ import com.google.inject.{Inject, Singleton}
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finagle.{Service, SimpleFilter}
 import com.twitter.inject.Logging
-import com.twitter.inject.requestscope.FinagleRequestScope
 import com.twitter.util.{Future => TwitterFuture}
 import domain.models.{Company, User}
 import domain.repositories.{CompanyRepository, UserRepository}
@@ -22,7 +21,7 @@ import scala.util.Try
 class AuthenticatedUserFilter @Inject()(encryptionConfig: EncryptionConfig,
                                         userRepository: UserRepository,
                                         companyRepository: CompanyRepository,
-                                        userScope: AuthenticatedUser)
+                                        authenticatedUser: AuthenticatedUser)
   extends SimpleFilter[Request, Response] with Logging {
   private val TOKEN_HEADER_PREFIX = "Bearer "
   private val INVALID_TOKEN_LOG = "An invalid Token was provided for user/company."
@@ -43,10 +42,10 @@ class AuthenticatedUserFilter @Inject()(encryptionConfig: EncryptionConfig,
   private def injectUserInScope(token: String, companySlug: String): TwitterFuture[AuthenticatedUser] = {
     ScalaFuture
       .fromTry(getJwtPayload(token))
-      .flatMap { payload =>retrieveUserAndCompany(payload, companySlug)
-      }.map {
+      .flatMap{payload => retrieveUserAndCompany(payload, companySlug)}
+      .map {
         case (Some(user), Some(company)) if user.companyIds.contains(company.id) =>
-          userScope
+          authenticatedUser
             .setUser(user)
             .setCompany(company)
         case _ =>
@@ -61,7 +60,6 @@ class AuthenticatedUserFilter @Inject()(encryptionConfig: EncryptionConfig,
 
   private def retrieveUserAndCompany(payload: JwtPayload, companySlug: String):
     ScalaFuture[(Option[User], Option[Company])] = {
-
     userRepository
       .findById(payload.id)
       .flatMap { maybeUser =>

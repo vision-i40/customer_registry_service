@@ -1,6 +1,9 @@
 package company_admin.requests
 
-case class ProductionLineRequest(
+import com.twitter.finatra.request.RouteParam
+
+case class ProductionLinePayload(
+  @RouteParam id: Option[String],
   name: String,
   oeeGoal: Double,
   resetProduction: Boolean,

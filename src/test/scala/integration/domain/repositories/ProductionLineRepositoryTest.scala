@@ -1,5 +1,6 @@
 package integration.domain.repositories
 
+import company_admin.requests.ProductionLinePayload
 import domain.models.Company
 import domain.repositories.{CompanyCollection, ProductionLineRepository}
 import infrastructure.config.MongoDBConfig
@@ -31,7 +32,7 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
     MongoDBHelper.insert[Company](rootCompany)
 
     repository
-      .addProductionLine(
+      .create(
         name = productionLine.name,
         oeeGoal = productionLine.oeeGoal,
         resetProduction = productionLine.resetProduction,
@@ -70,7 +71,7 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
     MongoDBHelper.insert[Company](noiseCompany)
 
     repository
-      .addProductionLine(
+      .create(
         name = expectedProductionLine.name,
         oeeGoal = expectedProductionLine.oeeGoal,
         resetProduction = expectedProductionLine.resetProduction,
@@ -95,6 +96,80 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
             actualProductionLine.createdAt.plusSeconds(2).isAfterNow shouldEqual true
             actualProductionLine.updatedAt.plusSeconds(2).isAfterNow shouldEqual true
         }
+      }
+  }
+
+  behavior of "updating production line"
+  it should "properly update production line that exists" in {
+    val firstProductionLine = ProductionLineBuilder().build
+    val secondProductionLine = ProductionLineBuilder().build
+    val expectedProductionLine = ProductionLineBuilder().build
+
+    val noiseCompany: Company = CompanyBuilder().build
+
+    implicit val rootCompany: Company = CompanyBuilder(productionLines = List(
+      firstProductionLine,
+      secondProductionLine,
+      expectedProductionLine
+    )).build
+
+    MongoDBHelper.insert[Company](rootCompany)
+    MongoDBHelper.insert[Company](noiseCompany)
+
+    val updatedPayload = ProductionLinePayload(
+      id = Some(expectedProductionLine.id),
+      name = "updated name",
+      oeeGoal = 1.9,
+      resetProduction = true,
+      discountRework = true,
+      discountWaste = true
+    )
+
+    repository
+      .update(expectedProductionLine.id, updatedPayload)
+      .flatMap { updateResult =>
+        updateResult.getModifiedCount shouldEqual 1
+
+        MongoDBHelper.find[Company](BsonDocument("id" -> rootCompany.id))
+          .map { updatedCompanies =>
+            updatedCompanies should have size 1
+            val productionLines = updatedCompanies.head.productionLines
+
+            productionLines should have size 3
+
+            val updatedProductionLine = productionLines.find(_.id.equals(expectedProductionLine.id)).get
+
+            updatedProductionLine.name shouldEqual updatedPayload.name
+            updatedProductionLine.oeeGoal shouldEqual updatedPayload.oeeGoal
+            updatedProductionLine.resetProduction shouldEqual updatedPayload.resetProduction
+            updatedProductionLine.discountRework shouldEqual updatedPayload.discountRework
+            updatedProductionLine.discountWaste shouldEqual updatedPayload.discountWaste
+          }
+      }
+  }
+
+  it should "not update production line that does not exist" in {
+    implicit val rootCompany: Company = CompanyBuilder().build
+
+    val id = "any-id"
+    val updatedPayload = ProductionLinePayload(
+      id = None,
+      name = "updated name",
+      oeeGoal = 1.9,
+      resetProduction = true,
+      discountRework = true,
+      discountWaste = true
+    )
+
+    repository
+      .update(id, updatedPayload)
+      .flatMap { updateResult =>
+        updateResult.getModifiedCount shouldEqual 0
+
+        MongoDBHelper.find[Company](BsonDocument("id" -> rootCompany.id))
+          .map { updatedCompanies =>
+            updatedCompanies should have size 0
+          }
       }
   }
 }
