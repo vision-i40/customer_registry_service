@@ -4,7 +4,7 @@ import authentication.models.AuthenticatedUser
 import com.google.inject.{Inject, Singleton}
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
-import company_admin.requests.{ProductionLinePayload, ShowProductionLineRequest}
+import company_admin.requests.{ProductionLinePayload, SingleProductionLineRequest}
 import domain.models.Company
 import domain.repositories.ProductionLineRepository
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -43,10 +43,18 @@ class ProductionLineController @Inject()(authenticatedUser: AuthenticatedUser,
       .map { _ => request}
   }
 
-  get(BASE_RESOURCE + "/production_line/:id") { request: ShowProductionLineRequest =>
+  get(BASE_RESOURCE + "/production_line/:id") { request: SingleProductionLineRequest =>
     authenticatedUser
       .getCompany
       .productionLines
       .find(_.id.equals(request.id))
+  }
+
+  delete(BASE_RESOURCE + "/production_line/:id") { request: SingleProductionLineRequest =>
+    implicit val company: Company = authenticatedUser.getCompany
+
+    repository
+      .delete(request.id)
+      .map { _ => response.noContent}
   }
 }

@@ -172,4 +172,43 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
           }
       }
   }
+
+
+  behavior of "deleting production line"
+  it should "properly delete the production line" in{
+    val firstProductionLine = ProductionLineBuilder().build
+    val secondProductionLine = ProductionLineBuilder().build
+    val thirdProductionLine = ProductionLineBuilder().build
+
+    val noiseCompany: Company = CompanyBuilder().build
+
+    implicit val rootCompany: Company = CompanyBuilder(productionLines = List(
+      firstProductionLine,
+      secondProductionLine,
+      thirdProductionLine
+    )).build
+
+    MongoDBHelper.insert[Company](rootCompany)
+    MongoDBHelper.insert[Company](noiseCompany)
+
+    repository
+      .delete(secondProductionLine.id)
+      .flatMap { deleteResult =>
+        deleteResult.getModifiedCount shouldEqual 1
+
+        MongoDBHelper.find[Company](BsonDocument("id" -> rootCompany.id))
+          .map { foundCompanies =>
+            foundCompanies should have size 1
+
+            val productionLines = foundCompanies.head.productionLines
+
+            productionLines should have size 2
+
+            productionLines.find(_.id.equals(secondProductionLine.id)) shouldEqual None
+          }
+      }
+
+  }
+
+
 }

@@ -56,6 +56,22 @@ class ProductionLineRepository @Inject()(companyCollection: CompanyCollection) {
       }
   }
 
+  def delete(id: String)(implicit  company: Company): Future[UpdateResult] = {
+    companyCollection
+      .collectionFuture
+      .flatMap{ collection =>
+        collection
+          .updateOne(
+            BsonDocument("id" -> company.id),
+            BsonDocument("$pull" ->
+              BsonDocument(
+                "productionLines" -> BsonDocument("id" -> id)
+              )
+            )
+          ).toFuture()
+      }
+  }
+
   private def buildProductionDocument(productionLine: ProductionLine): BsonDocument = {
     BsonDocument(
       "id" -> productionLine.id,
