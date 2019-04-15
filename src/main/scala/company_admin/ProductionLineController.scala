@@ -4,6 +4,7 @@ import authentication.models.AuthenticatedUser
 import com.google.inject.{Inject, Singleton}
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
+import com.twitter.inject.Logging
 import company_admin.requests.{ProductionLinePayload, SingleProductionLineRequest}
 import domain.models.Company
 import domain.repositories.ProductionLineRepository
@@ -11,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class ProductionLineController @Inject()(authenticatedUser: AuthenticatedUser,
-                                         repository: ProductionLineRepository) extends Controller {
+                                         repository: ProductionLineRepository) extends Controller with Logging {
   private val API_VERSION = "v1"
   private val COMPANY_SLUG = "company_slug"
   private val BASE_RESOURCE: String = "/" + API_VERSION + "/:" + COMPANY_SLUG
@@ -20,10 +21,13 @@ class ProductionLineController @Inject()(authenticatedUser: AuthenticatedUser,
     authenticatedUser
       .getCompany
       .productionLines
+      .sortBy(_.createdAt.getMillis)
+      .reverse
   }
 
   post(BASE_RESOURCE + "/production_lines") { request: ProductionLinePayload =>
     implicit val company: Company = authenticatedUser.getCompany
+    info(s"Saving company $company")
 
     repository
       .create(

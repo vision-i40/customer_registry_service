@@ -26,9 +26,13 @@ class AuthenticatedUserFilter @Inject()(encryptionConfig: EncryptionConfig,
   private val TOKEN_HEADER_PREFIX = "Bearer "
   private val INVALID_TOKEN_LOG = "An invalid Token was provided for user/company."
   private val NO_TOKEN_PROVIDED = "No token was provided."
+  private val EMPTY_STRING: String = ""
 
   override def apply(request: Request, service: Service[Request, Response]): TwitterFuture[Response] = {
-    val companySlug = request.getParam("company_slug")
+    val companySlug = request.getParam("company_slug") match {
+      case s: String => s
+      case _ => EMPTY_STRING
+    }
 
     request.authorization match {
       case Some(token) => injectUserInScope(token, companySlug).flatMap(_ => service(request))
@@ -42,12 +46,15 @@ class AuthenticatedUserFilter @Inject()(encryptionConfig: EncryptionConfig,
   private def injectUserInScope(token: String, companySlug: String): TwitterFuture[AuthenticatedUser] = {
     ScalaFuture
       .fromTry(getJwtPayload(token))
-      .flatMap{payload => retrieveUserAndCompany(payload, companySlug)}
+      .flatMap{payload =>
+        retrieveUserAndCompany(payload, companySlug)
+      }
       .map {
         case (Some(user), Some(company)) if user.companyIds.contains(company.id) =>
           authenticatedUser
             .setUser(user)
             .setCompany(company)
+        case (Some(user), _) => authenticatedUser.setUser(user)
         case _ =>
           info("Token provided does not match with any user/company in database.")
           throw UnauthorizedException(INVALID_TOKEN_LOG)
@@ -60,13 +67,11 @@ class AuthenticatedUserFilter @Inject()(encryptionConfig: EncryptionConfig,
 
   private def retrieveUserAndCompany(payload: JwtPayload, companySlug: String):
     ScalaFuture[(Option[User], Option[Company])] = {
-    userRepository
-      .findById(payload.id)
-      .flatMap { maybeUser =>
-        companyRepository
-          .findBySlug(companySlug)
-          .map { maybeCompany => (maybeUser, maybeCompany) }
-      }
+
+    for {
+      user <-userRepository.findById(payload.id)
+      company <- companyRepository.findBySlug(companySlug)
+    } yield (user, company)
   }
 
   private def getJwtPayload(token: String): Try[JwtPayload] = {
@@ -76,7 +81,7 @@ class AuthenticatedUserFilter @Inject()(encryptionConfig: EncryptionConfig,
   }
 
   private def normalizeToken(token: String): String = {
-    token.replace(TOKEN_HEADER_PREFIX, "")
+    token.replace(TOKEN_HEADER_PREFIX, EMPTY_STRING)
   }
 }
 
