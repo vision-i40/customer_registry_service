@@ -1,8 +1,9 @@
 package authentication
 
-import authentication.models.{AuthenticationToken, SignupRequest}
+import authentication.dtos.{AuthenticationResponse, SignupRequest}
+import authentication.exceptions.BadRequestException
 import com.google.inject.{Inject, Singleton}
-import domain.models.User
+import domain.models.{Company, User}
 import domain.repositories.{CompanyRepository, UserRepository}
 import infrastructure.config.EncryptionConfig
 
@@ -14,13 +15,18 @@ class SignUpService @Inject()(tokenBuilder: TokenBuilder,
                                companyRepository: CompanyRepository,
                               userRepository: UserRepository,
                               encryptionConfig: EncryptionConfig) {
-  def setupCompany(request: SignupRequest): Future[AuthenticationToken] = {
-    val userFuture: Future[User] = for {
+  private val BAD_REQUEST_MESSAGE = "There was an error while processing company/user information"
+
+  def setupCompany(request: SignupRequest): Future[AuthenticationResponse] = {
+    val userFuture = for {
       company <- companyRepository.create(request.companyName, sanitizeSlug(request))
       user <- userRepository.create(request.userEmail, request.userName, request.userPassword)(company)
-    } yield user
+    } yield (user, company)
 
-    userFuture.map(tokenBuilder.build)
+    userFuture.map{
+      case (user: User, company: Company) => AuthenticationResponse(tokenBuilder.build(user), user, company)
+      case _ => throw BadRequestException(BAD_REQUEST_MESSAGE)
+    }
   }
 
   private def sanitizeSlug(request: SignupRequest): String = {

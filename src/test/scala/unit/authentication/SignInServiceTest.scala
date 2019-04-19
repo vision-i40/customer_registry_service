@@ -1,41 +1,45 @@
 package unit.authentication
 
-import authentication.models.AuthenticationToken
 import authentication.{SignInService, TokenBuilder}
-import domain.models.User
-import domain.repositories.UserRepository
+import domain.models.{Company, User}
+import domain.repositories.{CompanyRepository, UserRepository}
 import infrastructure.config.EncryptionConfig
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
-import pdi.jwt.{Jwt, JwtAlgorithm}
-import sun.text.normalizer.ICUBinary.Authenticate
+import pdi.jwt.Jwt
 import support.VisionAsyncSpec
-import support.builders.UserBuilder
+import support.builders.{CompanyBuilder, UserBuilder}
 
 import scala.concurrent.Future
 
 class SignInServiceTest extends VisionAsyncSpec with MockitoSugar {
   private val config: EncryptionConfig = mock[EncryptionConfig]
-  private val repository: UserRepository = mock[UserRepository]
+  private val userRepository: UserRepository = mock[UserRepository]
+  private val companyRepository: CompanyRepository = mock[CompanyRepository]
   private val tokenBuilder: TokenBuilder = mock[TokenBuilder]
-  private val service = new SignInService(repository, tokenBuilder,config)
+  private val service = new SignInService(userRepository, companyRepository, tokenBuilder,config)
 
   behavior of "generate token"
   it should "return " in {
     val email = "email@@email.com"
     val password = "password"
-    val user: User = UserBuilder().build
-    val expectedJWTPayload = s"""{"id":"${user.id}"}"""
+    val expectedCompany: Company = CompanyBuilder().build
+    val expectedUser: User = UserBuilder(defaultCompanyId = expectedCompany.id).build
+    val expectedJWTPayload = s"""{"id":"${expectedUser.id}"}"""
+
     when(config.secretKey).thenReturn("a-secret-key")
-    when(tokenBuilder.build(user)).thenReturn(AuthenticationToken(Jwt.encode(expectedJWTPayload)))
-    when(repository.getByEmailAndPassword(email, password)).thenReturn(Future.successful(Some(user)))
+    when(tokenBuilder.build(expectedUser)).thenReturn(Jwt.encode(expectedJWTPayload))
+    when(userRepository.getByEmailAndPassword(email, password)).thenReturn(Future.successful(Some(expectedUser)))
+    when(companyRepository.findById(expectedUser.defaultCompanyId)).thenReturn(Future.successful(Some(expectedCompany)))
 
     val tokenFuture = service.generateToken(email, password)
 
-    tokenFuture.map { authorizationToken =>
-      val decodedToken = Jwt.decode(authorizationToken.token)
+    tokenFuture.map { authenticationResponse =>
+      val decodedToken = Jwt.decode(authenticationResponse.token)
       decodedToken.isSuccess shouldEqual true
       decodedToken.get shouldEqual expectedJWTPayload
+      authenticationResponse.user shouldEqual expectedUser
+      authenticationResponse.company shouldEqual expectedCompany
     }
   }
 }

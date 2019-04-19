@@ -1,6 +1,6 @@
 package company_admin
 
-import authentication.models.AuthenticatedUser
+import authentication.AuthenticatedUser
 import com.google.inject.{Inject, Singleton}
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
@@ -8,6 +8,7 @@ import com.twitter.inject.Logging
 import company_admin.requests.{ProductionLinePayload, SingleProductionLineRequest}
 import domain.models.Company
 import domain.repositories.ProductionLineRepository
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton

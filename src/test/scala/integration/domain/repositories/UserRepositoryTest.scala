@@ -30,7 +30,7 @@ class UserRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEach with Be
     val email = "email@email"
     val password = "password"
     val firstNoiseUser = UserBuilder().build
-    val expectedUser = UserBuilder(email = email, password = BCrypt.hashpw(password, encryptionConfig.salt)).build
+    val expectedUser = UserBuilder(email = email, password = Some(BCrypt.hashpw(password, encryptionConfig.salt))).build
     val secondNoiseUser = UserBuilder().build
 
     MongoDBHelper.insert(firstNoiseUser)

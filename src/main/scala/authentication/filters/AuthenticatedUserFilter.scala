@@ -1,7 +1,8 @@
 package authentication.filters
 
+import authentication.AuthenticatedUser
 import authentication.exceptions.UnauthorizedException
-import authentication.models.{AuthenticatedUser, JwtPayload}
+import authentication.dtos.JwtPayload
 import com.google.inject.{Inject, Singleton}
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finagle.{Service, SimpleFilter}

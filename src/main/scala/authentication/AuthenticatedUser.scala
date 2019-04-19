@@ -1,4 +1,4 @@
-package authentication.models
+package authentication
 
 import authentication.exceptions.UnauthorizedException
 import com.google.inject.Singleton
@@ -11,7 +11,7 @@ class AuthenticatedUser {
 
   def setUser(newUser: User): AuthenticatedUser = {
     this.user.synchronized {
-      this.user = Some(newUser.copy(password = "<RESTRICT>"))
+      this.user = Some(newUser)
     }
 
     this

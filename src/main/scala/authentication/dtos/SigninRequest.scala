@@ -1,4 +1,4 @@
-package authentication.models
+package authentication.dtos
 
 case class SigninRequest(
   email: String,

@@ -36,6 +36,7 @@ class UserRepository @Inject()(db: MongoDB, config: EncryptionConfig) {
           .find[User](filter)
           .first()
           .toFutureOption()
+          .map(_.map(_.copy(password = None)))
       })
   }
 
@@ -44,9 +45,10 @@ class UserRepository @Inject()(db: MongoDB, config: EncryptionConfig) {
     val user = User(
       id = randomUUID().toString,
       companyIds = List(company.id),
+      defaultCompanyId = company.id,
       email = email,
       username = username,
-      password = encryptPassword(password),
+      password = Some(encryptPassword(password)),
       isActive = true,
       createdAt = DateTime.now,
       updatedAt = DateTime.now

@@ -24,12 +24,20 @@ class CompanyRepository @Inject()(companyCollection: CompanyCollection) {
       }
   }
 
+  def findById(id: String): Future[Option[Company]] = {
+    findBy(BsonDocument("id" -> id))
+  }
+
   def findBySlug(slug: String): Future[Option[Company]] = {
+    findBy(BsonDocument("slug" -> slug))
+  }
+
+  def findBy(filter: BsonDocument): Future[Option[Company]] = {
     companyCollection
       .collectionFuture
       .flatMap { collection =>
         collection
-          .find(BsonDocument("slug" -> slug))
+          .find(filter)
           .first()
           .toFutureOption()
       }

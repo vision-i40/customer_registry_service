@@ -1,6 +1,6 @@
 package authentication
 
-import authentication.models.{SigninRequest, SignupRequest}
+import authentication.dtos.{SigninRequest, SignupRequest}
 import com.google.inject.{Inject, Singleton}
 import com.twitter.finatra.http.Controller
 import com.twitter.finatra.http.response.ResponseBuilder

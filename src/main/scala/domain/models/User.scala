@@ -6,12 +6,13 @@ import org.joda.time.DateTime
 case class User(
   id: String,
   companyIds: List[String],
+  defaultCompanyId: String,
   email: String,
   username: String,
-  password: String,
   isActive: Boolean,
   createdAt: DateTime,
-  updatedAt: DateTime
+  updatedAt: DateTime,
+  password: Option[String] = None
 )
 
 object User {
