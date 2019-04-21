@@ -11,6 +11,8 @@ lazy val versions = new {
   val logback = "1.2.3"
 }
 
+parallelExecution := false
+
 libraryDependencies ++= Seq(
   "com.twitter" %% "finatra-http" % versions.finatra,
   "com.twitter.inject" %% "inject-request-scope" % "2.1.6",

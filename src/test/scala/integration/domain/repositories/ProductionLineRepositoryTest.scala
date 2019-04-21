@@ -40,21 +40,23 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
         discountWaste = productionLine.discountWaste
       )
       .flatMap { _ =>
-        MongoDBHelper.find[Company](BsonDocument("id" -> rootCompany.id)).map { updatedCompanies =>
-          val productionLines = updatedCompanies.head.productionLines
+        MongoDBHelper
+          .find[Company](BsonDocument("id" -> rootCompany.id))
+          .map { updatedCompanies =>
+            val productionLines = updatedCompanies.head.productionLines
 
-          productionLines should have size 1
-          val insertedProductionLine = productionLines.head
+            productionLines should have size 1
+            val insertedProductionLine = productionLines.head
 
-          insertedProductionLine.name shouldEqual productionLine.name
-          insertedProductionLine.oeeGoal shouldEqual productionLine.oeeGoal
-          insertedProductionLine.resetProduction shouldEqual productionLine.resetProduction
-          insertedProductionLine.discountRework shouldEqual productionLine.discountRework
-          insertedProductionLine.discountWaste shouldEqual productionLine.discountWaste
-          insertedProductionLine.createdAt.plusSeconds(2).isAfterNow shouldEqual true
-          insertedProductionLine.updatedAt.plusSeconds(2).isAfterNow shouldEqual true
+            insertedProductionLine.name shouldEqual productionLine.name
+            insertedProductionLine.oeeGoal shouldEqual productionLine.oeeGoal
+            insertedProductionLine.resetProduction shouldEqual productionLine.resetProduction
+            insertedProductionLine.discountRework shouldEqual productionLine.discountRework
+            insertedProductionLine.discountWaste shouldEqual productionLine.discountWaste
+            insertedProductionLine.createdAt.plusSeconds(2).isAfterNow shouldEqual true
+            insertedProductionLine.updatedAt.plusSeconds(2).isAfterNow shouldEqual true
+          }
         }
-      }
   }
 
   it should "add a production line when production lines has others production lines" in {
