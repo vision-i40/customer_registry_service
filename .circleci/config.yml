@@ -56,20 +56,21 @@ jobs:
       - image: circleci/openjdk:8
     working_directory: ~/customer_registry_service
     environment:
-      ARTIFACT_NAME: registry.heroku.com/visioni40/customer_registry_service
-      GIT_COMMIT: $CIRCLE_SHA1
+      ARTIFACT_NAME: "registry.heroku.com/visioni40/customer_registry_service"
     steps:
       - checkout
 
       - run:
           name: "Build container"
-          command: sbt docker:publishLocal
+          command: |
+            export GIT_COMMIT=$CIRCLE_SHA1
+            sbt docker:publishLocal
 
       - run:
           name: "Publish docker container"
           command: |
             docker login --email=$HEROKU_LOGIN --username=$HEROKU_LOGIN --password=$HEROKU_API_KEY registry.heroku.com
-            docker push $ARTIFACT_NAME:$GIT_COMMIT
+            docker push $ARTIFACT_NAME:$CIRCLE_SHA1
 
 workflows:
   version: 2
