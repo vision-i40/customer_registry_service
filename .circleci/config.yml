@@ -1,5 +1,13 @@
 version: 2.1
 
+machine:
+  services:
+    - docker
+
+dependencies:
+  cache_directories:
+    - ~/docker
+
 jobs:
   build:
     working_directory: ~/customer_registry_service
@@ -42,3 +50,13 @@ jobs:
 
       - store_test_results:
           path: target/test-reports
+
+deployment:
+  staging:
+    branch: master
+    commands:
+      - export ARTIFACT_NAME=registry.heroku.com/visioni40/customer_registry_service
+      - export GIT_COMMIT=$CIRCLE_SHA1
+      - sbt docker:publishLocal
+      - docker login --email=$HEROKU_LOGIN --username=$HEROKU_LOGIN --password=$HEROKU_API_KEY registry.heroku.com
+      - docker push $ARTIFACT_NAME:$GIT_COMMIT

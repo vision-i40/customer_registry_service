@@ -1,5 +1,6 @@
-name := "customer_registry_service"
-version := "0.1"
+name := sys.env.getOrElse("ARTIFACT_NAME", "customer_registry_service")
+version := sys.env.getOrElse("GIT_COMMIT", "local")
+
 scalaVersion := "2.11.11"
 
 lazy val UnitTestConf = config("unit").extend(Test)
@@ -35,6 +36,9 @@ lazy val root = (project in file("."))
   .settings(
     mainClass in Compile := Some("Main")
   )
+
+dockerExposedPorts ++= Seq(8888, 9990)
+enablePlugins(JavaServerAppPackaging)
 
 lazy val unit = TaskKey[Unit]("unit", "Runs all Unit Tests.")
 lazy val integration = TaskKey[Unit]("integration", "Runs all Integration Tests.")
