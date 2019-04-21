@@ -1,9 +1,11 @@
 version: 2.1
+
 jobs:
   build:
     working_directory: ~/customer_registry_service
     docker:
       - image: circleci/openjdk:8
+      - image: circleci/mongo:4.0
     steps:
       - checkout
 
@@ -32,6 +34,11 @@ jobs:
           name: "Unit tests"
           command:
             sbt unit exit
+
+      - run:
+          name: "Integration tests"
+          command:
+            sbt integration exit
 
       - store_test_results:
           path: target/test-reports
