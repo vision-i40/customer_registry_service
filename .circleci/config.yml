@@ -1,9 +1,5 @@
 version: 2.1
 
-machine:
-  services:
-    - docker
-
 dependencies:
   cache_directories:
     - ~/docker
@@ -52,8 +48,12 @@ jobs:
           path: target/test-reports
 
   deploy:
+    machine:
+      services:
+        - docker
     docker:
       - image: circleci/openjdk:8
+      - image: docker:17.05.0-ce-git
     working_directory: ~/customer_registry_service
     environment:
       ARTIFACT_NAME: "registry.heroku.com/visioni40/customer_registry_service"
