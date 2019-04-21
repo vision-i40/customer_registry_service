@@ -55,6 +55,7 @@ jobs:
       ARTIFACT_NAME: "registry.heroku.com/visioni40/customer_registry_service"
     steps:
       - checkout
+
       - setup_remote_docker:
           docker_layer_caching: true
 
@@ -67,7 +68,8 @@ jobs:
       - run:
           name: "Publish docker container"
           command: |
-            docker login --email=$HEROKU_LOGIN --username=$HEROKU_LOGIN --password=$HEROKU_API_KEY registry.heroku.com
+            docker login --username=$HEROKU_LOGIN --password=$HEROKU_API_KEY registry.heroku.com
+            docker tag customer_registry_service:$CIRCLE_SHA1 $ARTIFACT_NAME:$CIRCLE_SHA1
             docker push $ARTIFACT_NAME:$CIRCLE_SHA1
 
 workflows:

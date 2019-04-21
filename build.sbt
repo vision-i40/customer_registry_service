@@ -1,4 +1,4 @@
-name := sys.env.getOrElse("ARTIFACT_NAME", "customer_registry_service")
+name := "customer_registry_service"
 version := sys.env.getOrElse("GIT_COMMIT", "local")
 
 scalaVersion := "2.11.11"
