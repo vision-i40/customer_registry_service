@@ -49,7 +49,6 @@ jobs:
 
   push-container:
     docker:
-      - image: circleci/openjdk:8
       - image: joseronierison/scala-sbt:scala-2.11
     working_directory: ~/customer_registry_service
     environment:
