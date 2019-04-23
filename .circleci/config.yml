@@ -17,7 +17,7 @@ setup_gcp_credentials: &setup_gcp_credentials
       gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT
 
 jobs:
-  build:
+  test-automation:
     working_directory: ~/customer_registry_service
     docker:
       - image: circleci/openjdk:8
@@ -108,10 +108,10 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
-      - build
+      - test-automation
       - push-container:
           requires:
-            - build
+            - test-automation
           filters:
             branches:
               only: master
