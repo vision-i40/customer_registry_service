@@ -26,8 +26,8 @@ class MongoDB @Inject()(config: MongoDBConfig) {
     .streamFactoryFactory(NettyStreamFactoryFactory.builder().build())
     .build()
 
-  private lazy val mongoClient: MongoClient = MongoClient(mongoClientSettings)
-  private lazy val database: MongoDatabase = mongoClient.getDatabase(config.database)
+  lazy val mongoClient: MongoClient = MongoClient(mongoClientSettings)
+  lazy val database: MongoDatabase = mongoClient.getDatabase(config.database)
 
   def collection[W:ClassTag](name: String)(implicit codec: CodecRegistry): Future[MongoCollection[W]] = Future {
     database
