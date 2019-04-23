@@ -7,7 +7,7 @@ class EncryptionConfigTest extends VisionSpec {
   private val config = new EncryptionConfig()
 
   behavior of "EncryptionConfig"
-  it should "return salt value" in {
+  it should "return decoded salt value" in {
     config.salt shouldEqual "$2a$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa"
   }
 

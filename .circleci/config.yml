@@ -4,6 +4,18 @@ dependencies:
   cache_directories:
     - ~/docker
 
+container_name: &container_name
+  gcr.io/vision-i40/customer_registry_service
+
+setup_gcp_credentials: &setup_gcp_credentials
+  run:
+    name: Setup GCP credentials
+    command: |
+      echo  $SERVICE_ACCOUNT_CONTENT | base64 -d > gcp.json
+      gcloud auth activate-service-account --key-file gcp.json
+      gcloud auth configure-docker --quiet
+      gcloud container clusters get-credentials $GKE_CLUSTER_NAME --zone $GKE_ZONE --project $GCP_PROJECT
+
 jobs:
   build:
     working_directory: ~/customer_registry_service
@@ -52,8 +64,7 @@ jobs:
       - image: joseronierison/scala-sbt:scala-2.11
     working_directory: ~/customer_registry_service
     environment:
-      ARTIFACT_NAME: "gcr.io/vision-i40/customer_registry_service"
-      GCP_ACCOUNT_FILE: "account.json"
+      ARTIFACT_NAME: *container_name
     steps:
       - checkout
 
@@ -66,14 +77,32 @@ jobs:
             export GIT_COMMIT=$CIRCLE_SHA1
             sbt docker:publishLocal
 
+      - *setup_gcp_credentials
+
       - run:
           name: "Publish docker container"
           command: |
-            echo  $SERVICE_ACCOUNT_CONTENT | base64 -d > $GCP_ACCOUNT_FILE
-            gcloud auth activate-service-account --key-file $GCP_ACCOUNT_FILE
-            gcloud auth configure-docker --quiet
             docker tag customer_registry_service:$CIRCLE_SHA1 $ARTIFACT_NAME:$CIRCLE_SHA1
             gcloud docker -- push $ARTIFACT_NAME:$CIRCLE_SHA1
+
+  deploy-to-staging:
+    docker:
+      - image: joseronierison/scala-sbt:scala-2.11
+    working_directory: ~/customer_registry_service
+    environment:
+      ARTIFACT_NAME: *container_name
+    steps:
+      - checkout
+
+      - setup_remote_docker:
+          docker_layer_caching: true
+
+      - *setup_gcp_credentials
+
+      - run:
+          name: "Deploy to staging"
+          command: |
+            kubectl set image deployments/$K8S_DEPLOYMENT_NAME $K8S_CONTAINER_NAME=$ARTIFACT_NAME:$CIRCLE_SHA1
 
 workflows:
   version: 2
@@ -86,3 +115,9 @@ workflows:
           filters:
             branches:
               only: master
+      - deploy-to-staging:
+          requires:
+            - push-container
+            filters:
+              branches:
+                only: master
