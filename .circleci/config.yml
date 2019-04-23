@@ -47,12 +47,14 @@ jobs:
       - store_test_results:
           path: target/test-reports
 
-  deploy:
+  push-container:
     docker:
       - image: circleci/openjdk:8
+      - image: joseronierison/scala-sbt:scala-2.11
     working_directory: ~/customer_registry_service
     environment:
-      ARTIFACT_NAME: "registry.heroku.com/visioni40/customer_registry_service"
+      ARTIFACT_NAME: "gcr.io/vision-i40/customer_registry_service"
+      GCP_ACCOUNT_FILE: "account.json"
     steps:
       - checkout
 
@@ -68,9 +70,11 @@ jobs:
       - run:
           name: "Publish docker container"
           command: |
-            docker login --username=$HEROKU_LOGIN --password=$HEROKU_API_KEY registry.heroku.com
+            echo  $SERVICE_ACCOUNT_CONTENT | base64 -d > $GCP_ACCOUNT_FILE
+            gcloud auth activate-service-account --key-file $GCP_ACCOUNT_FILE
+            gcloud auth configure-docker --quiet
             docker tag customer_registry_service:$CIRCLE_SHA1 $ARTIFACT_NAME:$CIRCLE_SHA1
-            docker push $ARTIFACT_NAME:$CIRCLE_SHA1
+            gcloud docker -- push $ARTIFACT_NAME:$CIRCLE_SHA1
 
 workflows:
   version: 2
