@@ -8,7 +8,7 @@ import com.twitter.finatra.http.filters.{CommonFilters, ExceptionMappingFilter, 
 import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.inject.requestscope.FinagleRequestScopeFilter
 import company_admin.ProductionLineController
-import infrastructure.CorsController
+import infrastructure.{CorsController, HealthCheckController}
 
 object Main extends HttpServer {
   override def configureHttp(router: HttpRouter): Unit = {
@@ -22,9 +22,9 @@ object Main extends HttpServer {
       .filter[ExceptionMappingFilter[Request]]
       .filter[FinagleRequestScopeFilter[Request, Response]]
       .add[CorsController]
+      .add[HealthCheckController]
       .add[AuthenticationController]
       .add[AuthenticatedUserFilter, ProductionLineController]
       .add[AuthenticatedUserFilter, UserController]
   }
-
 }
