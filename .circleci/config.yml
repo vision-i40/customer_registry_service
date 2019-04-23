@@ -81,7 +81,7 @@ workflows:
   build-and-deploy:
     jobs:
       - build
-      - deploy:
+      - push-container:
           requires:
             - build
           filters:
