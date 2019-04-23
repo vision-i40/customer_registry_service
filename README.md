@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/vision-i40/customer_registry_service.svg?style=svg)](https://circleci.com/gh/vision-i40/customer_registry_service)
+
 # Customer Registry Service
 
 Vision i4.0 is a opensource project which aims to help customer from industry to have a simple and efficiente way to store, analyse and improve the daily work in their proccess.
