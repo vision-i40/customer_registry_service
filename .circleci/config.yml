@@ -118,6 +118,6 @@ workflows:
       - deploy-to-staging:
           requires:
             - push-container
-            filters:
-              branches:
-                only: master
+          filters:
+            branches:
+              only: master
