@@ -15,4 +15,8 @@ class MongoDBConfigTest extends VisionSpec {
   it should "return database" in {
     config.database shouldEqual databaseName
   }
+
+  it should "return enabled flag" in {
+    config.isSslEnabled shouldEqual false
+  }
 }
