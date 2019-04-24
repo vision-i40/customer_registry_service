@@ -40,7 +40,6 @@ jobs:
             - ~/.sbt
             - ~/.ivy2/cache
       - save_cache:
-          # Change this key to start the next build with a fully clean cache and forget old scala, sbt and library versions
           key: app-cache-v1
           paths:
             - ~/.sbt
@@ -49,12 +48,12 @@ jobs:
       - run:
           name: "Unit tests"
           command:
-            sbt unit exit
+            sbt unit
 
       - run:
           name: "Integration tests"
           command:
-            sbt integration exit
+            sbt integration
 
       - store_test_results:
           path: target/test-reports
