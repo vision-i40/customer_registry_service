@@ -7,7 +7,7 @@ lazy val UnitTestConf = config("unit").extend(Test)
 lazy val IntegrationTestConf = config("integration").extend(Test)
 
 lazy val versions = new {
-  val finatra = "19.3.0"
+  val finatra = "19.5.1"
   val mongoDriver = "2.4.2"
   val logback = "1.2.3"
 }

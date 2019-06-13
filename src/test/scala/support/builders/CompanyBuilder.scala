@@ -31,7 +31,7 @@ case class CompanyBuilder(
     stopGroups = stopGroups,
     reworkGroups = reworkGroups,
     wasteGroups = wasteGroups,
-    unitOfMeasurements = unitOfMeasurements,
+    unitsOfMeasurement = unitOfMeasurements,
     createdAt = createdAt,
     updatedAt = updatedAt
   )
