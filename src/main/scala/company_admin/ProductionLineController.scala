@@ -5,7 +5,7 @@ import com.google.inject.{Inject, Singleton}
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import com.twitter.inject.Logging
-import company_admin.requests.{ProductionLinePayload, SingleProductionLineRequest}
+import company_admin.requests.{ProductionLinePayload, SingleResourceRequest}
 import domain.models.Company
 import domain.repositories.ProductionLineRepository
 
@@ -42,20 +42,21 @@ class ProductionLineController @Inject()(authenticatedUser: AuthenticatedUser,
 
   put(BASE_RESOURCE + "/production_line/:id") { request: ProductionLinePayload =>
     implicit val company: Company = authenticatedUser.getCompany
-
-    repository
-      .update(request.id.get, request)
+    request.id.map { productionLineId =>
+      repository
+        .update(productionLineId, request)
       .map { _ => request}
+    }
   }
 
-  get(BASE_RESOURCE + "/production_line/:id") { request: SingleProductionLineRequest =>
+  get(BASE_RESOURCE + "/production_line/:id") { request: SingleResourceRequest =>
     authenticatedUser
       .getCompany
       .productionLines
       .find(_.id.equals(request.id))
   }
 
-  delete(BASE_RESOURCE + "/production_line/:id") { request: SingleProductionLineRequest =>
+  delete(BASE_RESOURCE + "/production_line/:id") { request: SingleResourceRequest =>
     implicit val company: Company = authenticatedUser.getCompany
 
     repository

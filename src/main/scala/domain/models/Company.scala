@@ -4,18 +4,18 @@ import infrastructure.mongodb.codecs.JodaCodec
 import org.joda.time.DateTime
 
 case class Company(
-                    id: String,
-                    name: String,
-                    slug: String,
-                    productionLines: List[ProductionLine] = List(),
-                    turns: List[Turn] = List(),
-                    collectors: List[Collector] = List(),
-                    stopGroups: List[StopGroup] = List(),
-                    reworkGroups: List[ReworkGroup] = List(),
-                    wasteGroups: List[WasteGroup] = List(),
-                    unitsOfMeasurement: List[UnitOfMeasurement] = List(),
-                    createdAt: DateTime = DateTime.now,
-                    updatedAt: DateTime = DateTime.now
+  id: String,
+  name: String,
+  slug: String,
+  productionLines: List[ProductionLine] = List(),
+  turns: List[Turn] = List(),
+  collectors: List[Collector] = List(),
+  stopGroups: List[StopGroup] = List(),
+  reworkGroups: List[ReworkGroup] = List(),
+  wasteGroups: List[WasteGroup] = List(),
+  unitsOfMeasurement: List[UnitOfMeasurement] = List(),
+  createdAt: DateTime = DateTime.now,
+  updatedAt: DateTime = DateTime.now
 )
 
 object Company {

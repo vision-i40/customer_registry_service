@@ -8,7 +8,6 @@ import domain.models.{Company, ProductionLine}
 import org.joda.time.DateTime
 import org.mongodb.scala.bson.{BsonDateTime, BsonDocument}
 import org.mongodb.scala.result.UpdateResult
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -56,7 +55,7 @@ class ProductionLineRepository @Inject()(companyCollection: CompanyCollection) {
       }
   }
 
-  def delete(id: String)(implicit  company: Company): Future[UpdateResult] = {
+  def delete(id: String)(implicit company: Company): Future[UpdateResult] = {
     companyCollection
       .collectionFuture
       .flatMap{ collection =>

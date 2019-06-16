@@ -1,7 +1,6 @@
 package support
 
 import org.scalatest.{FlatSpec, Matchers}
-
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 import scala.concurrent.forkjoin.ForkJoinPool
 
