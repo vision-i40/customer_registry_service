@@ -7,7 +7,7 @@ import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.filters.{CommonFilters, ExceptionMappingFilter, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.inject.requestscope.FinagleRequestScopeFilter
-import company_admin.{ProductionLineController, UnitOfMeasurementController}
+import company_admin.{ProductionLineController, ReworkCodeController, UnitOfMeasurementController}
 import infrastructure.{CorsController, HealthCheckController}
 
 object Main extends HttpServer {
@@ -26,6 +26,7 @@ object Main extends HttpServer {
       .add[AuthenticationController]
       .add[AuthenticatedUserFilter, ProductionLineController]
       .add[AuthenticatedUserFilter, UnitOfMeasurementController]
+      .add[AuthenticatedUserFilter, ReworkCodeController]
       .add[AuthenticatedUserFilter, UserController]
   }
 }

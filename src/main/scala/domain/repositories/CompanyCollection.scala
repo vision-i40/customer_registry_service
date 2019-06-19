@@ -4,6 +4,7 @@ import com.google.inject.{Inject, Singleton}
 import domain.models.Company
 import infrastructure.mongodb.MongoDB
 import org.mongodb.scala.MongoCollection
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

@@ -1,12 +1,13 @@
 package domain.models
 
+import com.twitter.finatra.request.RouteParam
 import org.joda.time.DateTime
 
 case class ReworkCode(
-  id: String,
-  name: String,
-  reasonClazz: String,
-  createAt: DateTime,
-  updateAt: DateTime,
-  description: Option[String] = None
-)
+                       name: String,
+                       reasonClass: String,
+                       description: Option[String] = None,
+                       createdAt: Option[DateTime] = None,
+                       updatedAt: Option[DateTime] = None,
+                       @RouteParam id: Option[String] = None
+) extends CompanyResource

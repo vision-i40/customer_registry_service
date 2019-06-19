@@ -1,7 +1,6 @@
 package integration.domain.repositories
 
-import company_admin.requests.ProductionLinePayload
-import domain.models.Company
+import domain.models.{Company, ProductionLine}
 import domain.repositories.{CompanyCollection, ProductionLineRepository}
 import infrastructure.config.MongoDBConfig
 import infrastructure.mongodb.MongoDB
@@ -32,13 +31,7 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
     MongoDBHelper.insert[Company](rootCompany)
 
     repository
-      .create(
-        name = productionLine.name,
-        oeeGoal = productionLine.oeeGoal,
-        resetProduction = productionLine.resetProduction,
-        discountRework = productionLine.discountRework,
-        discountWaste = productionLine.discountWaste
-      )
+      .create(productionLine)
       .flatMap { _ =>
         MongoDBHelper
           .find[Company](BsonDocument("id" -> rootCompany.id))
@@ -53,8 +46,8 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
             insertedProductionLine.resetProduction shouldEqual productionLine.resetProduction
             insertedProductionLine.discountRework shouldEqual productionLine.discountRework
             insertedProductionLine.discountWaste shouldEqual productionLine.discountWaste
-            insertedProductionLine.createdAt.plusSeconds(2).isAfterNow shouldEqual true
-            insertedProductionLine.updatedAt.plusSeconds(2).isAfterNow shouldEqual true
+            insertedProductionLine.createdAt.get.plusSeconds(2).isAfterNow shouldEqual true
+            insertedProductionLine.updatedAt.get.plusSeconds(2).isAfterNow shouldEqual true
           }
         }
   }
@@ -73,13 +66,7 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
     MongoDBHelper.insert[Company](noiseCompany)
 
     repository
-      .create(
-        name = expectedProductionLine.name,
-        oeeGoal = expectedProductionLine.oeeGoal,
-        resetProduction = expectedProductionLine.resetProduction,
-        discountRework = expectedProductionLine.discountRework,
-        discountWaste = expectedProductionLine.discountWaste
-      )
+      .create(expectedProductionLine)
       .flatMap { _ =>
 
         MongoDBHelper
@@ -95,8 +82,8 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
             actualProductionLine.resetProduction shouldEqual expectedProductionLine.resetProduction
             actualProductionLine.discountRework shouldEqual expectedProductionLine.discountRework
             actualProductionLine.discountWaste shouldEqual expectedProductionLine.discountWaste
-            actualProductionLine.createdAt.plusSeconds(2).isAfterNow shouldEqual true
-            actualProductionLine.updatedAt.plusSeconds(2).isAfterNow shouldEqual true
+            actualProductionLine.createdAt.get.plusSeconds(2).isAfterNow shouldEqual true
+            actualProductionLine.updatedAt.get.plusSeconds(2).isAfterNow shouldEqual true
         }
       }
   }
@@ -118,8 +105,7 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
     MongoDBHelper.insert[Company](rootCompany)
     MongoDBHelper.insert[Company](noiseCompany)
 
-    val updatedPayload = ProductionLinePayload(
-      id = Some(expectedProductionLine.id),
+    val updatedPayload = expectedProductionLine.copy(
       name = "updated name",
       oeeGoal = 1.9,
       resetProduction = true,
@@ -128,7 +114,7 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
     )
 
     repository
-      .update(expectedProductionLine.id, updatedPayload)
+      .update(expectedProductionLine.id.get, updatedPayload)
       .flatMap { updateResult =>
         updateResult.getModifiedCount shouldEqual 1
 
@@ -146,6 +132,7 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
             updatedProductionLine.resetProduction shouldEqual updatedPayload.resetProduction
             updatedProductionLine.discountRework shouldEqual updatedPayload.discountRework
             updatedProductionLine.discountWaste shouldEqual updatedPayload.discountWaste
+            updatedProductionLine.updatedAt.get.plusSeconds(2).isAfterNow shouldEqual true
           }
       }
   }
@@ -154,7 +141,7 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
     implicit val rootCompany: Company = CompanyBuilder().build
 
     val id = "any-id"
-    val updatedPayload = ProductionLinePayload(
+    val updatedPayload = ProductionLine(
       id = None,
       name = "updated name",
       oeeGoal = 1.9,
@@ -175,7 +162,6 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
       }
   }
 
-
   behavior of "deleting production line"
   it should "properly delete the production line" in{
     val firstProductionLine = ProductionLineBuilder().build
@@ -194,7 +180,7 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
     MongoDBHelper.insert[Company](noiseCompany)
 
     repository
-      .delete(secondProductionLine.id)
+      .delete(secondProductionLine.id.get)
       .flatMap { deleteResult =>
         deleteResult.getModifiedCount shouldEqual 1
 
@@ -209,8 +195,5 @@ class ProductionLineRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEa
             productionLines.find(_.id.equals(secondProductionLine.id)) shouldEqual None
           }
       }
-
   }
-
-
 }

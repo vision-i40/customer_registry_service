@@ -11,6 +11,7 @@ case class Company(
   turns: List[Turn] = List(),
   collectors: List[Collector] = List(),
   stopGroups: List[StopGroup] = List(),
+  reworkCodes: List[ReworkCode] = List(),
   reworkGroups: List[ReworkGroup] = List(),
   wasteGroups: List[WasteGroup] = List(),
   unitsOfMeasurement: List[UnitOfMeasurement] = List(),

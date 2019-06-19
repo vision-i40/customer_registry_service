@@ -1,6 +1,5 @@
 package integration.domain.repositories
 
-import company_admin.requests.UnitOfMeasurementPayload
 import domain.models.Company
 import domain.repositories.{CompanyCollection, UnitOfMeasurementRepository}
 import infrastructure.config.MongoDBConfig
@@ -24,20 +23,19 @@ class UnitOfMeasurementRepositoryTest extends VisionAsyncSpec with BeforeAndAfte
     MongoDBHelper.clearCollection()
   }
 
-  behavior of "UnitOfMeasurementRepositoryTest"
-
+  behavior of "adding unit of measurement"
   it should "add a unit of measurement when unit of measurement array is empty" in {
     implicit val rootCompany: Company = CompanyBuilder().build
-    val unitOfMeasurement = UnitOfMeasurementBuilder().build
+    val unitOfMeasurement = UnitOfMeasurementBuilder(
+      name = "update payload",
+      conversionFactor = 1.7,
+      description = Some("update description")
+    ).build
 
     MongoDBHelper.insert[Company](rootCompany)
 
     repository
-      .create(
-        name = unitOfMeasurement.name,
-        conversionFactor = unitOfMeasurement.conversionFactor,
-        description = unitOfMeasurement.description
-      )
+      .create(unitOfMeasurement)
       .flatMap { _ =>
         MongoDBHelper
           .find[Company](BsonDocument("id" -> rootCompany.id))
@@ -49,8 +47,7 @@ class UnitOfMeasurementRepositoryTest extends VisionAsyncSpec with BeforeAndAfte
 
             insertedUnitOfMeasurement.name shouldEqual unitOfMeasurement.name
             insertedUnitOfMeasurement.conversionFactor shouldEqual unitOfMeasurement.conversionFactor
-            insertedUnitOfMeasurement.createdAt.plusSeconds(2).isAfterNow shouldEqual true
-            insertedUnitOfMeasurement.updatedAt.plusSeconds(2).isAfterNow shouldEqual true
+            insertedUnitOfMeasurement.description shouldEqual unitOfMeasurement.description
           }
       }
   }
@@ -70,14 +67,14 @@ class UnitOfMeasurementRepositoryTest extends VisionAsyncSpec with BeforeAndAfte
     MongoDBHelper.insert[Company](rootCompany)
     MongoDBHelper.insert[Company](noiseCompany)
 
-    val updatePayload = UnitOfMeasurementPayload(
+    val updatePayload = firstUnitOfMeasurement.copy(
       name = "update payload",
-      conversion_factor = 1.7,
+      conversionFactor = 1.7,
       description = Some("update description")
     )
 
     repository
-      .update(firstUnitOfMeasurement.id, updatePayload)
+      .update(firstUnitOfMeasurement.id.get, updatePayload)
       .flatMap { updateResult =>
         updateResult.getModifiedCount shouldEqual 1
 
@@ -91,9 +88,9 @@ class UnitOfMeasurementRepositoryTest extends VisionAsyncSpec with BeforeAndAfte
             val updateUnitOfMeasurement = unitsOfMeasurement.find(_.id.equals(firstUnitOfMeasurement.id)).get
 
             updateUnitOfMeasurement.name shouldEqual updatePayload.name
-            updateUnitOfMeasurement.conversionFactor shouldEqual updatePayload.conversion_factor
+            updateUnitOfMeasurement.conversionFactor shouldEqual updatePayload.conversionFactor
             updateUnitOfMeasurement.description shouldEqual updatePayload.description
-            updateUnitOfMeasurement.updatedAt.plusSeconds(2).isAfterNow shouldEqual true
+            updateUnitOfMeasurement.updatedAt.get.plusSeconds(2).isAfterNow shouldEqual true
           }
       }
   }
@@ -116,34 +113,33 @@ class UnitOfMeasurementRepositoryTest extends VisionAsyncSpec with BeforeAndAfte
     MongoDBHelper.insert[Company](noiseCompany)
 
     repository
-        .delete(firstUnitOfMeasurement.id)
-        .flatMap{ deleteResult =>
-          deleteResult.getModifiedCount shouldEqual 1
+      .delete(firstUnitOfMeasurement.id.get)
+      .flatMap{ deleteResult =>
+        deleteResult.getModifiedCount shouldEqual 1
 
-          MongoDBHelper
-            .find[Company](BsonDocument("id" -> rootCompany.id))
-            .flatMap{ companies =>
-              companies should have size 1
-              val actualCompany = companies.head
+        MongoDBHelper
+          .find[Company](BsonDocument("id" -> rootCompany.id))
+          .flatMap{ companies =>
+            companies should have size 1
+            val actualCompany = companies.head
 
-              actualCompany.unitsOfMeasurement should have size 1
+            actualCompany.unitsOfMeasurement should have size 1
 
-              actualCompany.unitsOfMeasurement.find(_.id.equals(firstUnitOfMeasurement.id)) shouldEqual None
+            actualCompany.unitsOfMeasurement.find(_.id.equals(firstUnitOfMeasurement.id)) shouldEqual None
 
-              MongoDBHelper
-                .find[Company](BsonDocument("id" -> noiseCompany.id))
-                .map{ companies =>
-                  companies should have size 1
+            MongoDBHelper
+              .find[Company](BsonDocument("id" -> noiseCompany.id))
+              .map{ companies =>
+                companies should have size 1
 
-                  companies.find(_.id.equals(rootCompany.id)) shouldEqual None
+                companies.find(_.id.equals(rootCompany.id)) shouldEqual None
 
-                  val actualCompany = companies.head
+                val actualCompany = companies.head
 
-                  actualCompany.unitsOfMeasurement should have size 1
-                }
-            }
-
-        }
+                actualCompany.unitsOfMeasurement should have size 1
+              }
+          }
+      }
 
   }
 

@@ -5,8 +5,8 @@ import com.google.inject.{Inject, Singleton}
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import com.twitter.inject.Logging
-import company_admin.requests.{ProductionLinePayload, SingleResourceRequest}
-import domain.models.Company
+import company_admin.requests.SingleResourceRequest
+import domain.models.{Company, ProductionLine}
 import domain.repositories.ProductionLineRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -22,30 +22,25 @@ class ProductionLineController @Inject()(authenticatedUser: AuthenticatedUser,
     authenticatedUser
       .getCompany
       .productionLines
-      .sortBy(_.createdAt.getMillis)
+      .sortBy(_.createdAt.get.getMillis)
       .reverse
   }
 
-  post(BASE_RESOURCE + "/production_lines") { request: ProductionLinePayload =>
+  post(BASE_RESOURCE + "/production_lines") { payload: ProductionLine =>
     implicit val company: Company = authenticatedUser.getCompany
     info(s"Saving company $company")
 
     repository
-      .create(
-        name = request.name,
-        oeeGoal = request.oeeGoal,
-        resetProduction = request.resetProduction,
-        discountRework = request.discountRework,
-        discountWaste = request.discountWaste)
+      .create(payload)
       .map(productionLine => response.created.body(productionLine))
   }
 
-  put(BASE_RESOURCE + "/production_line/:id") { request: ProductionLinePayload =>
+  put(BASE_RESOURCE + "/production_line/:id") { payload: ProductionLine =>
     implicit val company: Company = authenticatedUser.getCompany
-    request.id.map { productionLineId =>
+    payload.id.map { productionLineId =>
       repository
-        .update(productionLineId, request)
-      .map { _ => request}
+        .update(productionLineId, payload)
+      .map { _ => payload}
     }
   }
 
@@ -53,7 +48,7 @@ class ProductionLineController @Inject()(authenticatedUser: AuthenticatedUser,
     authenticatedUser
       .getCompany
       .productionLines
-      .find(_.id.equals(request.id))
+      .find(_.id.exists(_.equals(request.id)))
   }
 
   delete(BASE_RESOURCE + "/production_line/:id") { request: SingleResourceRequest =>

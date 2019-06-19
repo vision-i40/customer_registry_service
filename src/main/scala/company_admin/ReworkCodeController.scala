@@ -6,52 +6,52 @@ import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import com.twitter.inject.Logging
 import company_admin.requests.SingleResourceRequest
-import domain.models.{Company, UnitOfMeasurement}
-import domain.repositories.UnitOfMeasurementRepository
+import domain.models.{Company, ReworkCode}
+import domain.repositories.ReworkCodeRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class UnitOfMeasurementController @Inject()(authenticatedUser: AuthenticatedUser,
-                                            repository: UnitOfMeasurementRepository) extends Controller with Logging  {
+class ReworkCodeController @Inject()(authenticatedUser: AuthenticatedUser,
+                                     repository: ReworkCodeRepository) extends Controller with Logging {
   private val API_VERSION = "v1"
   private val COMPANY_SLUG = "company_slug"
   private val BASE_RESOURCE: String = "/" + API_VERSION + "/:" + COMPANY_SLUG
 
-  get(BASE_RESOURCE + "/units_of_measurement") { _: Request =>
+  get(BASE_RESOURCE + "/rework_codes") { _: Request =>
     authenticatedUser
       .getCompany
-      .unitsOfMeasurement
+      .productionLines
       .sortBy(_.createdAt.get.getMillis)
       .reverse
   }
 
-  post(BASE_RESOURCE + "/units_of_measurement") { payload: UnitOfMeasurement =>
+  post(BASE_RESOURCE + "/rework_codes") { payload: ReworkCode =>
     implicit val company: Company = authenticatedUser.getCompany
     info(s"Saving company $company")
 
     repository
       .create(payload)
-      .map(unitOfMeasurement => response.created.body(unitOfMeasurement))
+      .map(productionLine => response.created.body(productionLine))
   }
 
-  put(BASE_RESOURCE + "/unit_of_measurement/:id") { payload: UnitOfMeasurement =>
+  put(BASE_RESOURCE + "/rework_code/:id") { payload: ReworkCode =>
     implicit val company: Company = authenticatedUser.getCompany
-    payload.id.map { unitOfMeasurementId =>
+    payload.id.map { productionLineId =>
       repository
-        .update(unitOfMeasurementId, payload)
-        .map { _ => payload}
+        .update(productionLineId, payload)
+      .map { _ => payload}
     }
   }
 
-  get(BASE_RESOURCE + "/unit_of_measurement/:id") { request: SingleResourceRequest =>
+  get(BASE_RESOURCE + "/rework_code/:id") { request: SingleResourceRequest =>
     authenticatedUser
       .getCompany
-      .unitsOfMeasurement
+      .productionLines
       .find(_.id.exists(_.equals(request.id)))
   }
 
-  delete(BASE_RESOURCE + "/unit_of_measurement/:id") { request: SingleResourceRequest =>
+  delete(BASE_RESOURCE + "/rework_code/:id") { request: SingleResourceRequest =>
     implicit val company: Company = authenticatedUser.getCompany
 
     repository
