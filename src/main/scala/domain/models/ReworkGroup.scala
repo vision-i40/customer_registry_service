@@ -3,10 +3,10 @@ package domain.models
 import org.joda.time.DateTime
 
 case class ReworkGroup(
-  id: String,
   name: String,
   reworkCodes: List[ReworkCode],
-  updateAt: DateTime,
-  createAt: DateTime,
-  description: Option[String] = None
-)
+  description: Option[String] = None,
+  updatedAt: Option[DateTime] = None,
+  createdAt: Option[DateTime] = None,
+  id: Option[String] = None
+) extends CompanyResource

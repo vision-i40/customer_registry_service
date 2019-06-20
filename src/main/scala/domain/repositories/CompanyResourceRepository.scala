@@ -1,13 +1,11 @@
 package domain.repositories
 
 import java.util.UUID
-
 import domain.models.{Company, CompanyResource}
 import org.bson.{BsonNull, BsonValue}
 import org.joda.time.DateTime
 import org.mongodb.scala.bson.{BsonBoolean, BsonDateTime, BsonDocument, BsonNumber, BsonString}
 import org.mongodb.scala.result.UpdateResult
-
 import scala.concurrent.{ExecutionContext, Future}
 
 trait CompanyResourceRepository[T <: CompanyResource] {
@@ -90,11 +88,11 @@ trait CompanyResourceRepository[T <: CompanyResource] {
 
     val staticFields = List("id", "createdAt")
 
-    val creationSetupValues = Map[String, BsonValue](
+    val updateSetupValues = Map[String, BsonValue](
       "updatedAt" -> BsonDateTime(DateTime.now.getMillis)
     )
 
-    (resource ++ creationSetupValues -- staticFields).map(m => setStructure(m._1) -> m._2)
+    (resource ++ updateSetupValues -- staticFields).map(m => setStructure(m._1) -> m._2)
   }
 
   private def caseClassToTraversable(resource: T): Map[String, BsonValue] =

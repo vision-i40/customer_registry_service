@@ -3,11 +3,11 @@ package domain.models
 import org.joda.time.DateTime
 
 case class Turn(
-  id: String,
   name: String,
   startTime: DateTime,
   endTime: DateTime,
-  createdAt: DateTime,
-  updatedAt: DateTime,
-  description: Option[String] = None
-)
+  description: Option[String] = None,
+  id: Option[String] = None,
+  createdAt: Option[DateTime] = None,
+  updatedAt: Option[DateTime] = None
+) extends CompanyResource
