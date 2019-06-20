@@ -21,7 +21,7 @@ class ReworkCodeController @Inject()(authenticatedUser: AuthenticatedUser,
   get(BASE_RESOURCE + "/rework_codes") { _: Request =>
     authenticatedUser
       .getCompany
-      .productionLines
+      .reworkCodes
       .sortBy(_.createdAt.get.getMillis)
       .reverse
   }
@@ -32,14 +32,14 @@ class ReworkCodeController @Inject()(authenticatedUser: AuthenticatedUser,
 
     repository
       .create(payload)
-      .map(productionLine => response.created.body(productionLine))
+      .map(reworkCode => response.created.body(reworkCode))
   }
 
   put(BASE_RESOURCE + "/rework_code/:id") { payload: ReworkCode =>
     implicit val company: Company = authenticatedUser.getCompany
-    payload.id.map { productionLineId =>
+    payload.id.map { reworkCodeId =>
       repository
-        .update(productionLineId, payload)
+        .update(reworkCodeId, payload)
       .map { _ => payload}
     }
   }
@@ -47,7 +47,7 @@ class ReworkCodeController @Inject()(authenticatedUser: AuthenticatedUser,
   get(BASE_RESOURCE + "/rework_code/:id") { request: SingleResourceRequest =>
     authenticatedUser
       .getCompany
-      .productionLines
+      .reworkCodes
       .find(_.id.exists(_.equals(request.id)))
   }
 
