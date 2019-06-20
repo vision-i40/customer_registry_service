@@ -3,7 +3,7 @@ package domain.repositories
 import java.util.UUID
 
 import domain.models.{Company, CompanyResource}
-import org.bson.{BsonArray, BsonNull, BsonValue}
+import org.bson.{BsonNull, BsonValue}
 import org.joda.time.{DateTime, LocalTime}
 import org.mongodb.scala.bson.{BsonBoolean, BsonDateTime, BsonDocument, BsonInt32, BsonNumber, BsonString}
 import org.mongodb.scala.result.UpdateResult
