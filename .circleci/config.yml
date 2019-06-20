@@ -105,15 +105,3 @@ workflows:
   build-and-deploy:
     jobs:
       - test-automation
-      - push-container:
-          requires:
-            - test-automation
-          filters:
-            branches:
-              only: master
-      - deploy-to-staging:
-          requires:
-            - push-container
-          filters:
-            branches:
-              only: master
