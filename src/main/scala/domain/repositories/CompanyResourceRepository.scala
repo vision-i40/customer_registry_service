@@ -1,11 +1,13 @@
 package domain.repositories
 
 import java.util.UUID
+
 import domain.models.{Company, CompanyResource}
-import org.bson.{BsonNull, BsonValue}
-import org.joda.time.DateTime
-import org.mongodb.scala.bson.{BsonBoolean, BsonDateTime, BsonDocument, BsonNumber, BsonString}
+import org.bson.{BsonArray, BsonNull, BsonValue}
+import org.joda.time.{DateTime, LocalTime}
+import org.mongodb.scala.bson.{BsonBoolean, BsonDateTime, BsonDocument, BsonInt32, BsonNumber, BsonString}
 import org.mongodb.scala.result.UpdateResult
+
 import scala.concurrent.{ExecutionContext, Future}
 
 trait CompanyResourceRepository[T <: CompanyResource] {
@@ -84,15 +86,13 @@ trait CompanyResourceRepository[T <: CompanyResource] {
   }
 
   private def overrideUpdateParams(resource: Map[String, BsonValue]): Map[String, BsonValue] = {
-    val setStructure: String => String = value => s"$resourceName.$$.$value"
-
-    val staticFields = List("id", "createdAt")
-
+    val buildUpdateKey: String => String = value => s"$resourceName.$$.$value"
+    val immutableFields = List("id", "createdAt")
     val updateSetupValues = Map[String, BsonValue](
       "updatedAt" -> BsonDateTime(DateTime.now.getMillis)
     )
 
-    (resource ++ updateSetupValues -- staticFields).map(m => setStructure(m._1) -> m._2)
+    (resource ++ updateSetupValues -- immutableFields).map(m => buildUpdateKey(m._1) -> m._2)
   }
 
   private def caseClassToTraversable(resource: T): Map[String, BsonValue] =
@@ -112,6 +112,7 @@ trait CompanyResourceRepository[T <: CompanyResource] {
     case x: String => BsonString(x)
     case Some(x: String) => BsonString(x)
     case x: DateTime => BsonDateTime(x.getMillis)
+    case x: LocalTime => BsonInt32(x.getMillisOfDay)
     case _ => new BsonNull
   }
 }

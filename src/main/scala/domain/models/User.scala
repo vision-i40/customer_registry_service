@@ -1,6 +1,6 @@
 package domain.models
 
-import infrastructure.mongodb.codecs.JodaCodec
+import infrastructure.mongodb.codecs.JodaDateTimeCodec
 import org.joda.time.DateTime
 
 case class User(
@@ -23,7 +23,7 @@ object User {
 
   implicit val userCodecRegistry: CodecRegistry = fromRegistries(
     fromProviders(classOf[User]),
-    fromCodecs(new JodaCodec),
+    fromCodecs(new JodaDateTimeCodec),
     DEFAULT_CODEC_REGISTRY
   )
 }

@@ -1,6 +1,6 @@
 package domain.models
 
-import infrastructure.mongodb.codecs.JodaCodec
+import infrastructure.mongodb.codecs.{JodaDateTimeCodec, JodaLocalTimeCodec}
 import org.joda.time.DateTime
 
 case class Company(
@@ -40,7 +40,8 @@ object Company {
       classOf[WasteCode],
       classOf[UnitOfMeasurement]
     ),
-    fromCodecs(new JodaCodec),
+    fromCodecs(new JodaDateTimeCodec),
+    fromCodecs(new JodaLocalTimeCodec),
     DEFAULT_CODEC_REGISTRY
   )
 }

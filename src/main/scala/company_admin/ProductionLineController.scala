@@ -6,56 +6,41 @@ import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import com.twitter.inject.Logging
 import company_admin.requests.SingleResourceRequest
-import domain.models.{Company, ProductionLine}
-import domain.repositories.ProductionLineRepository
+import domain.models.{Company, ProductionLine, ReworkCode}
+import domain.repositories.{CompanyResourceRepository, ProductionLineRepository}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class ProductionLineController @Inject()(authenticatedUser: AuthenticatedUser,
-                                         repository: ProductionLineRepository) extends Controller with Logging {
-  private val API_VERSION = "v1"
-  private val COMPANY_SLUG = "company_slug"
-  private val BASE_RESOURCE: String = "/" + API_VERSION + "/:" + COMPANY_SLUG
+class ProductionLineController @Inject()(productionLineRepository: ProductionLineRepository,
+                                         user: AuthenticatedUser) extends AbstractController[ProductionLine] {
+  override protected val authenticatedUser: AuthenticatedUser = user
+  override protected val repository: CompanyResourceRepository[ProductionLine] = productionLineRepository
+  override protected val COMPANY_RESOURCE_KEY: String = "productionLines"
+  override protected val RESOURCE_PLURAL: String = "production_lines"
+  override protected val RESOURCE_SINGULAR: String = "production_line"
 
-  get(BASE_RESOURCE + "/production_lines") { _: Request =>
-    authenticatedUser
-      .getCompany
-      .productionLines
+  type PayloadType = ProductionLine
+
+  get(INDEX_ROUTE) { _: Request =>
+    getResourceList[PayloadType]
       .sortBy(_.createdAt.get.getMillis)
       .reverse
   }
 
-  post(BASE_RESOURCE + "/production_lines") { payload: ProductionLine =>
-    implicit val company: Company = authenticatedUser.getCompany
-    info(s"Saving company $company")
-
-    repository
-      .create(payload)
-      .map(productionLine => response.created.body(productionLine))
+  post(INDEX_ROUTE) { payload: PayloadType =>
+    post(payload)
   }
 
-  put(BASE_RESOURCE + "/production_line/:id") { payload: ProductionLine =>
-    implicit val company: Company = authenticatedUser.getCompany
-    payload.id.map { productionLineId =>
-      repository
-        .update(productionLineId, payload)
-      .map { _ => payload}
-    }
+  put(SINGLE_ROUTE) { payload: PayloadType =>
+    put(payload)
   }
 
-  get(BASE_RESOURCE + "/production_line/:id") { request: SingleResourceRequest =>
-    authenticatedUser
-      .getCompany
-      .productionLines
-      .find(_.id.exists(_.equals(request.id)))
+  get(SINGLE_ROUTE) { request: SingleResourceRequest =>
+    getResourceList[PayloadType].find(_.id.exists(_.equals(request.id)))
   }
 
-  delete(BASE_RESOURCE + "/production_line/:id") { request: SingleResourceRequest =>
-    implicit val company: Company = authenticatedUser.getCompany
-
-    repository
-      .delete(request.id)
-      .map { _ => response.noContent}
+  delete(SINGLE_ROUTE) { request: SingleResourceRequest =>
+    delete(request)
   }
 }

@@ -1,11 +1,11 @@
 package domain.models
 
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, LocalTime}
 
 case class Turn(
   name: String,
-  startTime: DateTime,
-  endTime: DateTime,
+  startTime: LocalTime,
+  endTime: LocalTime,
   description: Option[String] = None,
   id: Option[String] = None,
   createdAt: Option[DateTime] = None,

@@ -6,6 +6,7 @@ import org.joda.time.DateTime
 case class ReworkCode(
   name: String,
   reasonClass: String,
+  reworkGroupId: String,
   description: Option[String] = None,
   createdAt: Option[DateTime] = None,
   updatedAt: Option[DateTime] = None,
