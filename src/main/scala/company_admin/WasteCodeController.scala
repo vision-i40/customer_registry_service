@@ -4,21 +4,19 @@ import authentication.AuthenticatedUser
 import com.google.inject.{Inject, Singleton}
 import com.twitter.finagle.http.Request
 import company_admin.requests.SingleResourceRequest
-import domain.models.{Company, Turn}
-import domain.repositories.{CompanyResourceRepository, TurnRepository}
-
-import scala.concurrent.ExecutionContext.Implicits.global
+import domain.models.WasteCode
+import domain.repositories.{CompanyResourceRepository, WasteCodeRepository}
 
 @Singleton
-class TurnController @Inject()(turnRepository: TurnRepository,
-                               user: AuthenticatedUser) extends AbstractController[Turn]  {
+class WasteCodeController @Inject()(wasteCodeRepository: WasteCodeRepository,
+                                    user: AuthenticatedUser) extends AbstractController[WasteCode] {
   override protected val authenticatedUser: AuthenticatedUser = user
-  override protected val repository: CompanyResourceRepository[Turn] = turnRepository
-  override protected val companyResourceKey: String = "turns"
-  override protected val resourcePlural: String = "turns"
-  override protected val resourceSingular: String = "turn"
+  override protected val repository: CompanyResourceRepository[WasteCode] = wasteCodeRepository
+  override protected val companyResourceKey: String = "wasteCodes"
+  override protected val resourcePlural: String = "waste_codes"
+  override protected val resourceSingular: String = "waste_code"
 
-  type PayloadType = Turn
+  type PayloadType = WasteCode
 
   get(indexRoute) { _: Request =>
     getResourceList[PayloadType]

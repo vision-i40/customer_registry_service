@@ -4,7 +4,7 @@ import authentication.AuthenticatedUser
 import com.twitter.finatra.http.Controller
 import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.inject.Logging
-import company_admin.requests.SingleResourceRequest
+import company_admin.requests.{NestedResourceRequest, SingleResourceRequest}
 import domain.models.{Company, CompanyResource}
 import domain.repositories.CompanyResourceRepository
 
@@ -18,13 +18,22 @@ trait AbstractController[R <: CompanyResource] extends Controller with Logging {
 
   protected val API_VERSION = "v1"
   protected val COMPANY_SLUG = "company_slug"
-  protected val BASE_RESOURCE: String = "/" + API_VERSION + "/:" + COMPANY_SLUG
-  protected val COMPANY_RESOURCE_KEY: String
-  protected val RESOURCE_PLURAL: String
-  protected val RESOURCE_SINGULAR: String
+  protected val baseResource: String = "/" + API_VERSION + "/:" + COMPANY_SLUG
+  protected val companyResourceKey: String
+  protected val resourcePlural: String
+  protected val resourceSingular: String
+  protected val parentResource: Option[String] = None
 
-  protected lazy val INDEX_ROUTE = s"$BASE_RESOURCE/$RESOURCE_PLURAL"
-  protected lazy val SINGLE_ROUTE = s"$BASE_RESOURCE/$RESOURCE_SINGULAR/:id"
+  protected def indexRoute = {
+    parentResource
+      .map(p => s"$baseResource/$p/:parent_id/$resourcePlural")
+      .getOrElse(s"$baseResource/$resourcePlural")
+  }
+  protected def singleRoute = {
+    parentResource
+      .map(p => s"$baseResource/$p/:parent_id/$resourcePlural/:id")
+      .getOrElse(s"$baseResource/$resourceSingular/:id")
+  }
 
   def post(payload: R): Future[ResponseBuilder#EnrichedResponse] = {
     implicit val company: Company = authenticatedUser.getCompany
@@ -51,12 +60,20 @@ trait AbstractController[R <: CompanyResource] extends Controller with Logging {
       .map { _ => response.noContent}
   }
 
+  def delete(request: NestedResourceRequest): Future[ResponseBuilder#EnrichedResponse] = {
+    implicit val company: Company = authenticatedUser.getCompany
+
+    repository
+      .delete(request.parent_id, request.id)
+      .map { _ => response.noContent}
+  }
+
   protected def getResourceList[T:ClassTag]: List[T] = {
     val company = authenticatedUser.getCompany
 
     company
       .getClass
-      .getMethod(COMPANY_RESOURCE_KEY)
+      .getMethod(companyResourceKey)
       .invoke(company)
       .asInstanceOf[List[T]]
   }

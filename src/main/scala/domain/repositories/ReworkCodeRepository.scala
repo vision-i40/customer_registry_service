@@ -8,4 +8,5 @@ class ReworkCodeRepository @Inject()(collection: CompanyCollection)
   extends CompanyResourceRepository[ReworkCode] {
   override protected val resourceName: String = "reworkCodes"
   override protected val companyCollection: CompanyCollection = collection
+  override protected val parentResource: Option[String] = Some("reworkGroups")
 }

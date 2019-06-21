@@ -42,6 +42,7 @@ class ReworkGroupRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEach 
             val insertedReworkGroup = reworkGroups.head
 
             insertedReworkGroup.name shouldEqual reworkGroup.name
+            insertedReworkGroup.reworkCodes should have size 0
             insertedReworkGroup.description shouldEqual reworkGroup.description
             insertedReworkGroup.createdAt.get.plusSeconds(2).isAfterNow shouldEqual true
             insertedReworkGroup.updatedAt.get.plusSeconds(2).isAfterNow shouldEqual true
@@ -68,6 +69,7 @@ class ReworkGroupRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEach 
 
     val updatedPayload = expectedReworkGroup.copy(
       name = "updated name",
+      reworkCodes = List(),
       description = Some("other description")
     )
 
@@ -86,6 +88,7 @@ class ReworkGroupRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEach 
             val updatedReworkGroup = reworkGroups.find(_.id.equals(expectedReworkGroup.id)).get
 
             updatedReworkGroup.name shouldEqual updatedPayload.name
+            updatedReworkGroup.reworkCodes should have size 1
             updatedReworkGroup.description shouldEqual updatedPayload.description
             updatedReworkGroup.updatedAt.get.plusSeconds(2).isAfterNow shouldEqual true
           }

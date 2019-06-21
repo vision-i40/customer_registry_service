@@ -1,5 +1,5 @@
 package domain.models
 
 case object Devices extends Enumeration {
-  val WISE: Devices.Value = Value("WISE")
+  val WISE: Devices.Value = Value
 }

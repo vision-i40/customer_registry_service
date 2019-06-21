@@ -1,9 +1,13 @@
 package domain.models
 
+import com.twitter.finatra.request.RouteParam
+import org.joda.time.DateTime
+
 case class Collector(
-  id: String,
   uid: String,
   deviceType: Devices.Value,
   authToken: String,
-  channels: List[Channel]
-)
+  createdAt: Option[DateTime] = None,
+  updatedAt: Option[DateTime] = None,
+  @RouteParam id: Option[String] = None
+) extends CompanyResource
