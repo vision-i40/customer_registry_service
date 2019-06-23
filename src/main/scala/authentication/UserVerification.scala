@@ -1,28 +1,24 @@
-package domain.models
+package authentication
 
 import infrastructure.mongodb.codecs.JodaDateTimeCodec
 import org.joda.time.DateTime
 
-case class User(
-  id: String,
-  name: String,
-  email: String,
-  username: String,
-  password: String,
-  updatedAt: DateTime,
+case class UserVerification(
+  token: String,
+  expiresAt: DateTime,
+  wasUsed: Boolean = false,
   createdAt: DateTime,
-  isActive: Boolean = false,
-  defaultCompanyId: Option[String] = None
+  activatedAt: Option[DateTime] = None
 )
 
-object User {
+object UserVerification {
   import org.bson.codecs.configuration.CodecRegistries.{fromCodecs, fromProviders, fromRegistries}
   import org.bson.codecs.configuration.CodecRegistry
   import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
   import org.mongodb.scala.bson.codecs.Macros._
 
   implicit val userCodecRegistry: CodecRegistry = fromRegistries(
-    fromProviders(classOf[User]),
+    fromProviders(classOf[UserVerification]),
     fromCodecs(new JodaDateTimeCodec),
     DEFAULT_CODEC_REGISTRY
   )

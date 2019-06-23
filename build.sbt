@@ -17,6 +17,8 @@ parallelExecution := false
 libraryDependencies ++= Seq(
   "com.twitter" %% "finatra-http" % versions.finatra,
   "com.twitter.inject" %% "inject-request-scope" % "2.1.6",
+  "org.json4s"  %% "json4s-jackson" % "3.6.6",
+  "com.google.cloud" % "google-cloud-pubsub" % "1.78.0",
   "ch.qos.logback" % "logback-classic" % versions.logback % Runtime,
   "org.apache.logging.log4j" % "log4j-core" % "2.7",
   "org.mongodb.scala" %% "mongo-scala-driver" % versions.mongoDriver,

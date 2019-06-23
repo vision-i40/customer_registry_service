@@ -1,9 +1,8 @@
 package authentication.dtos
 
-import domain.models.{Company, User}
+import org.joda.time.DateTime
 
 case class AuthenticationResponse(
   token: String,
-  user: User,
-  company: Company
+  expiresAt: DateTime
 )

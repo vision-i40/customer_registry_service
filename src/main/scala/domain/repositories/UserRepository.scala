@@ -1,12 +1,9 @@
 package domain.repositories
 
-import java.util.UUID.randomUUID
-
 import com.google.inject.{Inject, Singleton}
-import domain.models.{Company, User}
-import infrastructure.config.EncryptionConfig
+import domain.models.User
+import infrastructure.config.AuthConfig
 import infrastructure.mongodb.MongoDB
-import org.joda.time.DateTime
 import org.mindrot.jbcrypt.BCrypt
 import org.mongodb.scala.MongoCollection
 import org.mongodb.scala.bson.BsonDocument
@@ -15,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class UserRepository @Inject()(db: MongoDB, config: EncryptionConfig) {
+class UserRepository @Inject()(db: MongoDB, config: AuthConfig) {
   import User._
   private val COLLECTION_NAME = "users"
 
@@ -36,24 +33,10 @@ class UserRepository @Inject()(db: MongoDB, config: EncryptionConfig) {
           .find[User](filter)
           .first()
           .toFutureOption()
-          .map(_.map(_.copy(password = None)))
       })
   }
 
-  def create(email: String, username: String, password: String)
-            (implicit company: Company): Future[User] = {
-    val user = User(
-      id = randomUUID().toString,
-      companyIds = List(company.id),
-      defaultCompanyId = company.id,
-      email = email,
-      username = username,
-      password = Some(encryptPassword(password)),
-      isActive = true,
-      createdAt = DateTime.now,
-      updatedAt = DateTime.now
-    )
-
+  def create(user: User): Future[User] = {
     collectionFuture
       .flatMap { collection =>
         collection
@@ -64,6 +47,6 @@ class UserRepository @Inject()(db: MongoDB, config: EncryptionConfig) {
   }
 
   private def encryptPassword(password: String): String = {
-    BCrypt.hashpw(password, config.salt)
+    BCrypt.hashpw(password, config.bcryptSalt)
   }
 }

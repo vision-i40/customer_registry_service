@@ -10,5 +10,6 @@ case class StopCode(
   allowChangeInPendingStops: Boolean,
   createdAt: Option[DateTime] = None,
   updatedAt: Option[DateTime] = None,
+  @RouteParam parentId: Option[String] = None,
   @RouteParam id: Option[String] = None
 ) extends CompanyResource

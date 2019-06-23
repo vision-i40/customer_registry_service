@@ -15,7 +15,7 @@ class UserController @Inject()(authenticatedUser: AuthenticatedUser,
     val currentUser = authenticatedUser.getUser
 
     companyRepository
-      .findById(currentUser.defaultCompanyId)
+      .findById(currentUser.defaultCompanyId.get)
       .map(UserInformation.apply(currentUser, _))
   }
 }

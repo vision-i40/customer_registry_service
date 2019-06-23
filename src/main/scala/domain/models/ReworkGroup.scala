@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 
 case class ReworkGroup(
   name: String,
-  reworkCodes: List[ReworkCode],
+  reworkCodes: List[ReworkCode] = List(),
   description: Option[String] = None,
   createdAt: Option[DateTime] = None,
   updatedAt: Option[DateTime] = None,

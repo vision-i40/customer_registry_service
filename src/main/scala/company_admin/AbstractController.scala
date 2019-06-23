@@ -24,12 +24,12 @@ trait AbstractController[R <: CompanyResource] extends Controller with Logging {
   protected val resourceSingular: String
   protected val parentResource: Option[String] = None
 
-  protected def indexRoute = {
+  protected def indexRoute: String = {
     parentResource
       .map(p => s"$baseResource/$p/:parent_id/$resourcePlural")
       .getOrElse(s"$baseResource/$resourcePlural")
   }
-  protected def singleRoute = {
+  protected def singleRoute: String = {
     parentResource
       .map(p => s"$baseResource/$p/:parent_id/$resourcePlural/:id")
       .getOrElse(s"$baseResource/$resourceSingular/:id")
@@ -43,11 +43,28 @@ trait AbstractController[R <: CompanyResource] extends Controller with Logging {
       .map(response.created.body)
   }
 
+  def post(parentId: String, payload: R): Future[ResponseBuilder#EnrichedResponse] = {
+    implicit val company: Company = authenticatedUser.getCompany
+
+    repository
+      .create(parentId, payload)
+      .map(response.created.body)
+  }
+
   def put(payload: R): Option[Future[R]] = {
     implicit val company: Company = authenticatedUser.getCompany
     payload.id.map { id =>
       repository
         .update(id, payload)
+        .map { _ => payload}
+    }
+  }
+
+  def put(parentId: String, payload: R): Option[Future[R]] = {
+    implicit val company: Company = authenticatedUser.getCompany
+    payload.id.map { id =>
+      repository
+        .update(parentId, id, payload)
         .map { _ => payload}
     }
   }

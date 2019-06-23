@@ -1,8 +1,8 @@
 package authentication.filters
 
 import authentication.AuthenticatedUser
-import authentication.exceptions.UnauthorizedException
 import authentication.dtos.JwtPayload
+import authentication.exceptions.UnauthorizedException
 import com.google.inject.{Inject, Singleton}
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finagle.{Service, SimpleFilter}
@@ -11,7 +11,7 @@ import com.twitter.util.{Future => TwitterFuture}
 import domain.models.{Company, User}
 import domain.repositories.{CompanyRepository, UserRepository}
 import infrastructure.FutureConversions._
-import infrastructure.config.EncryptionConfig
+import infrastructure.config.AuthConfig
 import pdi.jwt.{Jwt, JwtAlgorithm}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -19,7 +19,7 @@ import scala.concurrent.{Future => ScalaFuture}
 import scala.util.Try
 
 @Singleton
-class AuthenticatedUserFilter @Inject()(encryptionConfig: EncryptionConfig,
+class AuthenticatedUserFilter @Inject()(authConfig: AuthConfig,
                                         userRepository: UserRepository,
                                         companyRepository: CompanyRepository,
                                         authenticatedUser: AuthenticatedUser)
@@ -51,7 +51,7 @@ class AuthenticatedUserFilter @Inject()(encryptionConfig: EncryptionConfig,
         retrieveUserAndCompany(payload, companySlug)
       }
       .map {
-        case (Some(user), Some(company)) if user.companyIds.contains(company.id) =>
+        case (Some(user), Some(company)) =>
           authenticatedUser
             .setUser(user)
             .setCompany(company)
@@ -77,7 +77,7 @@ class AuthenticatedUserFilter @Inject()(encryptionConfig: EncryptionConfig,
 
   private def getJwtPayload(token: String): Try[JwtPayload] = {
     Jwt
-      .decode(normalizeToken(token), encryptionConfig.secretKey, Seq(JwtAlgorithm.HS256))
+      .decode(normalizeToken(token), authConfig.secretKey, Seq(JwtAlgorithm.HS256))
       .map(JwtPayload.parse)
   }
 

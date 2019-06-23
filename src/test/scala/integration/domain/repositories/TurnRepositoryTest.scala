@@ -144,5 +144,4 @@ class TurnRepositoryTest extends VisionAsyncSpec with BeforeAndAfterEach {
       }
 
   }
-
 }

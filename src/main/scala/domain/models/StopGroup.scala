@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 
 case class StopGroup(
   name: String,
-  stopCodes: List[StopCode],
+  stopCodes: List[StopCode] = List(),
   description: Option[String] = None,
   createdAt: Option[DateTime] = None,
   updatedAt: Option[DateTime] = None,

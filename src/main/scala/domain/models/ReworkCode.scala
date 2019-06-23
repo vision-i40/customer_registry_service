@@ -9,5 +9,6 @@ case class ReworkCode(
   description: Option[String] = None,
   createdAt: Option[DateTime] = None,
   updatedAt: Option[DateTime] = None,
+  @RouteParam parentId: Option[String] = None,
   @RouteParam id: Option[String] = None
 ) extends CompanyResource

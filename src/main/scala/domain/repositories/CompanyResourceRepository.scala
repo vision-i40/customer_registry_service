@@ -18,32 +18,35 @@ trait CompanyResourceRepository[T <: CompanyResource] {
   protected val companyCollection: CompanyCollection
   protected val parentResource: Option[String] = None
 
-  private val immutableFields = List("id", "createdAt")
+  private val immutableFields = List("id", "createdAt", "updatedAt")
+  private val preventedFields = List("parentId")
 
   def create(resource: T)
-            (implicit company: Company, ec: ExecutionContext): Future[T] = {
+            (implicit company: Company, ec: ExecutionContext): Future[Map[String, Any]] = {
     create(resource, None)
   }
 
   def create(parentId: String, resource: T)
-            (implicit company: Company, ec: ExecutionContext): Future[T] = {
+            (implicit company: Company, ec: ExecutionContext): Future[Map[String, Any]] = {
     create(resource, Some(parentId))
   }
 
   private def create(resource: T, maybeParentId: Option[String] = None)
-                    (implicit company: Company, ec: ExecutionContext): Future[T] = {
+                    (implicit company: Company, ec: ExecutionContext): Future[Map[String, Any]] = {
     companyCollection
       .collectionFuture
       .flatMap { collection =>
+        val document: BsonDocument = buildCreationDocument(resource)
+
         collection
           .updateOne(buildPushFilter(maybeParentId),
             BsonDocument(
               "$push" -> BsonDocument(
-                buildPushKey -> buildCreationDocument(resource)
+                buildPushKey -> document
               )
             ))
           .toFuture()
-          .map(_ => resource)
+          .map(_ => injectDocumentValues(resource, document))
       }
   }
 
@@ -133,8 +136,24 @@ trait CompanyResourceRepository[T <: CompanyResource] {
       .getOrElse(resourceName)
   }
 
+  private def injectDocumentValues(resource: T, document: BsonDocument): Map[String, Any] = {
+    resource
+      .getClass
+      .getDeclaredFields
+      .foldLeft(Map[String, Any]()) { (p, f) =>
+        f.setAccessible(true)
+        val value = f.getName match {
+          case "id" => document.getString(f.getName).getValue
+          case "createdAt" | "updatedAt" => new DateTime(document.getDateTime(f.getName).getValue)
+          case _ => f.get(resource)
+        }
+
+        p + (f.getName -> value)
+      }
+  }
+
   private def buildCreationDocument(resource: T): BsonDocument = {
-    val ccMap = overrideCreationParams(caseClassToTraversable(resource))
+    val ccMap = overrideCreationParams(getStorableFields(resource))
     BsonDocument(ccMap)
   }
 
@@ -149,18 +168,16 @@ trait CompanyResourceRepository[T <: CompanyResource] {
   }
 
   private def buildUpdateDocument(resourcePayload: T): BsonDocument = {
-    val ccMap = overrideUpdateParams(caseClassToTraversable(resourcePayload))
+    val ccMap = overrideUpdateParams(getStorableFields(resourcePayload))
     BsonDocument(ccMap)
   }
 
   private def overrideUpdateParams(resource: Map[String, BsonValue]): Map[String, BsonValue] = {
-    val collectionFields = resource.filter(_._2.isArray).keys
-
     val updateSetupValues = Map[String, BsonValue](
       "updatedAt" -> BsonDateTime(DateTime.now.getMillis)
     )
 
-    (resource ++ updateSetupValues -- immutableFields -- collectionFields).map(m => buildUpdateKey(m._1) -> m._2)
+    (resource -- immutableFields ++ updateSetupValues).map(m => buildUpdateKey(m._1) -> m._2)
   }
 
   private def buildUpdateKey(key: String) = {
@@ -171,14 +188,19 @@ trait CompanyResourceRepository[T <: CompanyResource] {
       .getOrElse(s"$resourceName.$$.$key")
   }
 
-  private def caseClassToTraversable(resource: T): Map[String, BsonValue] =
-    resource
+  private def getStorableFields(resource: T): Map[String, BsonValue] = {
+    val allFields = resource
       .getClass
       .getDeclaredFields
       .foldLeft(Map[String, BsonValue]()) { (a, f) =>
         f.setAccessible(true)
         a + (f.getName -> destructBsonValue(f.get(resource)))
       }
+
+    val collectionFields = allFields.filter(_._2.isArray).keys
+
+    allFields -- preventedFields -- collectionFields
+  }
 
   private def destructBsonValue(value: Any): BsonValue = value match {
     case x: Boolean => BsonBoolean(x)

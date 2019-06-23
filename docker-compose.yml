@@ -1,6 +1,14 @@
 version: '3.5'
 
 services:
+  pubsub:
+    image: adilsoncarvalho/gcloud-pubsub-emulator:162.0.0-alpine
+    ports:
+      - 8085:8085
+    environment:
+      - PUBSUB_EMULATOR_HOST=localhost:8085
+      - PUBSUB_PROJECT_ID=my-project-id
+
   mongodb:
     image: mongo:4.0
     ports:

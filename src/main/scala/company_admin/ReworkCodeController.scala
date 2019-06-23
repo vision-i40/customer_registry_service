@@ -2,8 +2,7 @@ package company_admin
 
 import authentication.AuthenticatedUser
 import com.google.inject.{Inject, Singleton}
-import com.twitter.finagle.http.Request
-import company_admin.requests.{NestedResourceRequest, SingleResourceRequest}
+import company_admin.requests.NestedResourceRequest
 import domain.models.ReworkCode
 import domain.repositories.{CompanyResourceRepository, ReworkCodeRepository}
 
@@ -19,26 +18,23 @@ class ReworkCodeController @Inject()(reworkCodeRepository: ReworkCodeRepository,
 
   type PayloadType = ReworkCode
 
-  get(indexRoute) { _: Request =>
-    getResourceList[PayloadType]
-      .sortBy(_.createdAt.get.getMillis)
-      .reverse
-  }
-
   post(indexRoute) { payload: PayloadType =>
-    post(payload)
+    payload
+      .parentId
+      .map { parentId =>
+        post(parentId, payload)
+      }
   }
 
-  put(singleRoute) { payload: PayloadType =>
-    put(payload)
+  put(singleRoute) { payload: ReworkCode =>
+    payload
+      .parentId
+      .map { parentId =>
+        put(parentId, payload)
+      }
   }
 
   delete(singleRoute) { request: NestedResourceRequest =>
     delete(request)
-  }
-
-  get(singleRoute) { request: NestedResourceRequest =>
-    getResourceList[PayloadType]
-      .find(_.id.exists(_.equals(request.id)))
   }
 }
