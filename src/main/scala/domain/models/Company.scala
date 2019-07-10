@@ -17,6 +17,7 @@ case class Company(
   wasteCodes: List[WasteCode] = List(),
   wasteGroups: List[WasteGroup] = List(),
   unitsOfMeasurement: List[UnitOfMeasurement] = List(),
+  equipments: List[Equipment] = List(),
   createdAt: DateTime = DateTime.now,
   updatedAt: DateTime = DateTime.now
 )
@@ -40,7 +41,8 @@ object Company {
       classOf[StopCode],
       classOf[WasteGroup],
       classOf[WasteCode],
-      classOf[UnitOfMeasurement]
+      classOf[UnitOfMeasurement],
+      classOf[Equipment]
     ),
     fromCodecs(new JodaDateTimeCodec),
     fromCodecs(new JodaLocalTimeCodec),

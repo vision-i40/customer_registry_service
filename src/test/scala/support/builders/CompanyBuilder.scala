@@ -18,6 +18,7 @@ case class CompanyBuilder(
   reworkGroups: List[ReworkGroup] = List(),
   wasteGroups: List[WasteGroup] = List(),
   unitOfMeasurements: List[UnitOfMeasurement] = List(),
+  equipments: List[Equipment] = List(),
   createdAt: DateTime = DateTime.now,
   updatedAt: DateTime = DateTime.now
 ) {
@@ -32,6 +33,7 @@ case class CompanyBuilder(
     reworkGroups = reworkGroups,
     wasteGroups = wasteGroups,
     unitsOfMeasurement = unitOfMeasurements,
+    equipments = equipments,
     createdAt = createdAt,
     updatedAt = updatedAt
   )
